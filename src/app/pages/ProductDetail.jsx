@@ -183,6 +183,16 @@ export function ProductDetail() {
               {category.name}
             </Link>
             <ChevronRight className="w-4 h-4" />
+            <Link
+              to={category.id === 'doors'
+                ? `/category/${category.id}/${subcategory.id}/structures`
+                : `/category/${category.id}`
+              }
+              className="hover:text-foreground"
+            >
+              {subcategory.name}
+            </Link>
+            <ChevronRight className="w-4 h-4" />
             <span className="text-foreground">{model.name}</span>
           </div>
         </div>

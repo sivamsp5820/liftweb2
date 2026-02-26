@@ -1,12 +1,15 @@
-import { useParams, Link } from "react-router";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router";
+import { ArrowLeft, ChevronRight, Plus, Settings } from "lucide-react";
 import { liftModels, liftCategories, liftSubcategories } from "../data/lifts";
 import { motion, AnimatePresence } from "motion/react";
 import { useViewMode } from "../context/ViewModeContext";
+import { useCart } from "../context/CartContext";
 
 export function Variants() {
     const { categoryId, subcategoryId, productId } = useParams();
+    const navigate = useNavigate();
     const { viewMode, setViewMode } = useViewMode();
+    const { addToCart } = useCart();
 
     const category = liftCategories.find((c) => c.id === categoryId);
     const subcategory = liftSubcategories.find((s) => s.id === subcategoryId);
@@ -102,56 +105,55 @@ export function Variants() {
                                     whileHover="hover"
                                     transition={{ delay: index * 0.05 }}
                                 >
-                                    <Link
-                                        to={`/product/${model.id}?variant=${item.code}`}
-                                        className={`group block bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-xl transition-all duration-300 ${viewMode === 'technical' ? 'flex flex-col md:flex-row md:items-center justify-between gap-6' : ''}`}
-                                    >
-                                        <div className="flex-1">
-                                            <div className="text-xs text-muted-foreground uppercase tracking-widest mb-2 font-semibold">
-                                                Description
-                                            </div>
-                                            <h3 className="text-xl md:text-2xl font-medium group-hover:text-primary transition-colors mb-4 line-clamp-2">
-                                                {item.description}
-                                            </h3>
+                                    <div className="group flex flex-col md:flex-row md:items-center gap-4">
+                                        <div className="flex-1 flex items-center justify-between gap-6 bg-card border border-border rounded-2xl p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl">
+                                            <Link
+                                                to={`/product/${model.id}?variant=${item.code}`}
+                                                className="flex-1"
+                                            >
+                                                <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">
+                                                    {subcategory.name}
+                                                </div>
+                                                <h3 className="text-xl md:text-2xl font-medium group-hover:text-primary transition-colors mb-4 line-clamp-2">
+                                                    {item.description}
+                                                </h3>
+                                                <div className="text-xs text-muted-foreground uppercase tracking-widest mb-1 font-semibold">
+                                                    Specifications
+                                                </div>
+                                                <div className="text-sm font-mono text-muted-foreground">
+                                                    ({item.code} / {item.subDescription})
+                                                </div>
+                                            </Link>
 
-                                            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-border/50 ${viewMode === 'technical' ? 'mt-0' : 'mt-4'}`}>
-                                                <div>
-                                                    <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Subassembly Code</div>
-                                                    <div className="text-sm font-mono font-bold bg-secondary/50 px-2 py-1 rounded inline-block text-primary">
-                                                        {item.code}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Subassembly Description</div>
-                                                    <div className="text-sm text-foreground/80 font-medium">
-                                                        {item.subDescription}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    addToCart({
+                                                        model,
+                                                        subcategory,
+                                                        category,
+                                                        selectedSpecs: {},
+                                                        selectedItem: item,
+                                                        selectedAddons: [],
+                                                        total: model.price,
+                                                    });
+                                                }}
+                                                className="w-12 h-12 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                                                title="Add to Cart"
+                                            >
+                                                <Plus className="w-5 h-5" />
+                                            </button>
                                         </div>
 
-                                        {viewMode === 'technical' && (
-                                            <motion.div
-                                                variants={{
-                                                    initial: { width: 48 },
-                                                    hover: { width: 128 }
-                                                }}
-                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                                className="h-12 flex items-center justify-center bg-primary/5 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300 relative overflow-hidden flex-shrink-0"
-                                            >
-                                                <motion.span
-                                                    variants={{
-                                                        initial: { opacity: 0, x: 20 },
-                                                        hover: { opacity: 1, x: 0 }
-                                                    }}
-                                                    className="absolute inset-0 flex items-center justify-center font-bold text-sm whitespace-nowrap text-primary-foreground"
-                                                >
-                                                    Configure {'>'}
-                                                </motion.span>
-                                                <ChevronRight className="w-5 h-5 group-hover:opacity-0 transition-opacity duration-300" />
-                                            </motion.div>
-                                        )}
-                                    </Link>
+                                        <button
+                                            onClick={() => navigate(`/product/${model.id}?variant=${item.code}`)}
+                                            className="w-full md:w-auto flex items-center justify-center gap-2 py-3 px-6 bg-primary text-primary-foreground rounded-xl transition-all font-semibold opacity-0 translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:pointer-events-auto whitespace-nowrap shadow-lg"
+                                        >
+                                            <Settings className="w-4 h-4 animate-spin-slow" />
+                                            <span>Configure Property</span>
+                                        </button>
+                                    </div>
                                 </motion.div>
                             ))}
                         </motion.div>

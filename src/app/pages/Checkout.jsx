@@ -303,7 +303,13 @@ export function Checkout() {
                       First Name <span className="text-destructive">*</span>
                     </label>
                     <input
-                      {...register("firstName", { required: "First name is required" })}
+                      {...register("firstName", {
+                        required: "First name is required",
+                        pattern: {
+                          value: /^[A-Za-z\s'-]+$/,
+                          message: "Invalid characters in name"
+                        }
+                      })}
                       className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                     {errors.firstName && (
@@ -318,7 +324,13 @@ export function Checkout() {
                       Last Name <span className="text-destructive">*</span>
                     </label>
                     <input
-                      {...register("lastName", { required: "Last name is required" })}
+                      {...register("lastName", {
+                        required: "Last name is required",
+                        pattern: {
+                          value: /^[A-Za-z\s'-]+$/,
+                          message: "Invalid characters in name"
+                        }
+                      })}
                       className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                     {errors.lastName && (
@@ -444,7 +456,13 @@ export function Checkout() {
                         ZIP/Postal Code <span className="text-destructive">*</span>
                       </label>
                       <input
-                        {...register("zipCode", { required: "ZIP code is required" })}
+                        {...register("zipCode", {
+                          required: "ZIP code is required",
+                          pattern: {
+                            value: /^[0-9A-Za-z\s-]+$/i,
+                            message: "Invalid ZIP code"
+                          }
+                        })}
                         className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                       {errors.zipCode && (

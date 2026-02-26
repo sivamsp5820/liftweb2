@@ -17,11 +17,20 @@ export function OrderConfirmation() {
   const [orderData, setOrderData] = useState(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("orderData");
-    if (stored) {
-      setOrderData(JSON.parse(stored));
-    } else {
-      // Redirect if no order data
+    try {
+      const stored = sessionStorage.getItem("orderData");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === 'object' && parsed.orderNumber && parsed.customerDetails) {
+          setOrderData(parsed);
+        } else {
+          navigate("/categories");
+        }
+      } else {
+        navigate("/categories");
+      }
+    } catch (e) {
+      console.error("Failed to parse order data", e);
       navigate("/categories");
     }
   }, [navigate]);
@@ -116,16 +125,18 @@ export function OrderConfirmation() {
                   {configuration.category.name} → {configuration.subcategory.name}
                 </div>
                 <h3 className="text-xl mb-2">{configuration.model.name}</h3>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Capacity:</span>{" "}
-                    {configuration.model.capacity}kg
+                {configuration.category.id !== "doors" && (
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Capacity:</span>{" "}
+                      {configuration.model.capacity}kg
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Speed:</span>{" "}
+                      {configuration.model.speed}
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Speed:</span>{" "}
-                    {configuration.model.speed}
-                  </div>
-                </div>
+                )}
               </div>
               <div className="text-right">
                 <div className="font-mono text-lg">

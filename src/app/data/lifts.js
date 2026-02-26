@@ -145,15 +145,15 @@ export const liftModels = [
       glassFinishFGD: ['Standard', 'TintedGrey', 'TintedBrown']
     },
     items: [
-      { description: "COR LD 01C 700x20 FVP", code: "SO0014658COR1C7020FVSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
-      { description: "COR LD 01C 700x20 00304 FVP", code: "SO0014761COR1C7020FVSP003", subDescription: "COR-LD-050-CP-DF-00-EN" },
-      { description: "COR LD 01C 700x21 FVP", code: "SO0014762COR1C7021FVSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
-      { description: "COR LD 01C 700x21 STD", code: "SO0014767COR1C7021STSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
-      { description: "COR LD 01C 800x20 RBY", code: "SO0014767COR1C8020RBSS430", subDescription: "COR-LD-050-CP-DF-00-BS" },
-      { description: "COR LD 01C 800x20 STD", code: "EX0000411COR1C8020STSP078", subDescription: "COR-LD-050-CP-DF-00-EN" },
-      { description: "COR LD 01C 800x21 FVP", code: "SO0014757COR1C8021FVSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
-      { description: "COR LD 01C 800x21 STD", code: "SO0014799COR1C8021STSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
-      { description: "COR LD 01C 900x21 00304 FVP", code: "SO0014512COR1C9021FV00304", subDescription: "COR-LD-050-CP-DF-00-EN" }
+      { description: "COR LD 01C 700x20 FVP", code: "COR1C7020FVSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
+      { description: "COR LD 01C 700x20 00304 FVP", code: "COR1C7020FVSP003", subDescription: "COR-LD-050-CP-DF-00-EN" },
+      { description: "COR LD 01C 700x21 FVP", code: "COR1C7021FVSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
+      { description: "COR LD 01C 700x21 STD", code: "COR1C7021STSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
+      { description: "COR LD 01C 800x20 RBY", code: "COR1C8020RBSS430", subDescription: "COR-LD-050-CP-DF-00-BS" },
+      { description: "COR LD 01C 800x20 STD", code: "COR1C8020STSP078", subDescription: "COR-LD-050-CP-DF-00-EN" },
+      { description: "COR LD 01C 800x21 FVP", code: "COR1C8021FVSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
+      { description: "COR LD 01C 800x21 STD", code: "COR1C8021STSS430", subDescription: "COR-LD-050-CP-DF-00-EN" },
+      { description: "COR LD 01C 900x21 00304 FVP", code: "COR1C9021FV00304", subDescription: "COR-LD-050-CP-DF-00-EN" }
     ],
     gallery: []
   },
@@ -186,11 +186,11 @@ export const liftModels = [
       lightCurtain: ['Static', 'Dynamic']
     },
     items: [
-      { description: "COR CD 02C 700x20 FVP", code: "SO0014658COR2C7020FVSS430", subDescription: "COR-CD-WL-CP-S" },
-      { description: "COR CD 02C 700x20 00304 FVP", code: "SO0014761COR2C7020FVSP003", subDescription: "COR-CD-WL-CP-S" },
-      { description: "COR CD 02C 700x21 FVP", code: "SO0014762COR2C7021FVSS430", subDescription: "COR-CD-WL-CP-S" },
-      { description: "COR CD 02C 800x21 FVP", code: "SO0014757COR2C8021FVSS430", subDescription: "COR-CD-WL-CP-S" },
-      { description: "COR CD 02C 900x21 00304 FVP", code: "SO0014512COR2C9021FV00304", subDescription: "COR-CD-WL-CP-S" }
+      { description: "COR CD 02C 700x20 FVP", code: "COR2C7020FVSS430", subDescription: "COR-CD-WL-CP-S" },
+      { description: "COR CD 02C 700x20 00304 FVP", code: "COR2C7020FVSP003", subDescription: "COR-CD-WL-CP-S" },
+      { description: "COR CD 02C 700x21 FVP", code: "COR2C7021FVSS430", subDescription: "COR-CD-WL-CP-S" },
+      { description: "COR CD 02C 800x21 FVP", code: "COR2C8021FVSS430", subDescription: "COR-CD-WL-CP-S" },
+      { description: "COR CD 02C 900x21 00304 FVP", code: "COR2C9021FV00304", subDescription: "COR-CD-WL-CP-S" }
     ],
     gallery: []
   },
@@ -224,9 +224,9 @@ export const liftModels = [
       closingMethod: ['Spring', 'ClosingRope', 'CounterWeight']
     },
     items: [
-      { description: "CORMD LD 01C 100x24 STD", code: "SO0016681CMD1C1024STSS430", subDescription: "CMD-LD-050-CP-CF-" },
-      { description: "CORMD LD 01C 100x24 00304 STD", code: "SO0016421CMD1C1024ST0304M", subDescription: "CMD-LD-050-CP-CF-" },
-      { description: "CORMD LD 01C 110x20 00304 STD", code: "SO0017165CMD1C1120ST00304", subDescription: "CMD-LD-050-CP-CF-" }
+      { description: "CORMD LD 01C 100x24 STD", code: "CMD1C1024STSS430", subDescription: "CMD-LD-050-CP-CF-" },
+      { description: "CORMD LD 01C 100x24 00304 STD", code: "CMD1C1024ST0304M", subDescription: "CMD-LD-050-CP-CF-" },
+      { description: "CORMD LD 01C 110x20 00304 STD", code: "CMD1C1120ST00304", subDescription: "CMD-LD-050-CP-CF-" }
     ],
     gallery: []
   },
@@ -253,9 +253,9 @@ export const liftModels = [
       lightCurtain: ['Static', 'Dynamic']
     },
     items: [
-      { description: "CORMD CD 02C 100x24 STD", code: "SO0016681CMD2C1024STSS430001", subDescription: "CMD-CD-MID-CP-D" },
-      { description: "CORMD CD 02C 100x24 00304 STD", code: "SO0016421CMD2C1024ST0304M", subDescription: "CMD-CD-MID-CP-D" },
-      { description: "CORMD CD 02C 110x20 00304 STD", code: "SO0017165CMD2C1120ST00304", subDescription: "CMD-CD-ECO-CP-D" }
+      { description: "CORMD CD 02C 100x24 STD", code: "CMD2C1024STSS430", subDescription: "CMD-CD-MID-CP-D" },
+      { description: "CORMD CD 02C 100x24 00304 STD", code: "CMD2C1024ST0304M", subDescription: "CMD-CD-MID-CP-D" },
+      { description: "CORMD CD 02C 110x20 00304 STD", code: "CMD2C1120ST00304", subDescription: "CMD-CD-ECO-CP-D" }
     ],
     gallery: []
   },
@@ -287,9 +287,9 @@ export const liftModels = [
       closingMethod: ['Spring']
     },
     items: [
-      { description: "STEL LD 01C 700x20 00304 FVP", code: "SO0017425STR1C7020FV0304M", subDescription: "STEL-LD-090-CP-CF-NTG" },
-      { description: "STEL LD 01C 700x20 00304 STD", code: "SO0017043STR1C7020ST00304", subDescription: "STEL-LD-050-CP-CF-000" },
-      { description: "STEL LD 01C 800x20 00304 FVP", code: "SO0017458STR1C8020FV00304", subDescription: "STEL-LD-090-CP-CF-NTG" }
+      { description: "STEL LD 01C 700x20 00304 FVP", code: "STR1C7020FV0304M", subDescription: "STEL-LD-090-CP-CF-NTG" },
+      { description: "STEL LD 01C 700x20 00304 STD", code: "STR1C7020ST00304", subDescription: "STEL-LD-050-CP-CF-000" },
+      { description: "STEL LD 01C 800x20 00304 FVP", code: "STR1C8020FV00304", subDescription: "STEL-LD-090-CP-CF-NTG" }
     ],
     gallery: []
   },
@@ -314,9 +314,9 @@ export const liftModels = [
       lightCurtain: ['Static']
     },
     items: [
-      { description: "STEL CD 02C 700x20 00304 FVP", code: "SO0017425STR2C7020FV0304M", subDescription: "STEL-CD-NTG-CP-" },
-      { description: "STEL CD 02C 700x20 00304 STD", code: "SO0017219STR2C7020ST00304", subDescription: "STEL-CD-000-CP-" },
-      { description: "STEL CD 02C 800x20 00304 FVP", code: "SO0016789STR2C8020FV00304", subDescription: "STEL-CD-NTG-CP-" }
+      { description: "STEL CD 02C 700x20 00304 FVP", code: "STR2C7020FV0304M", subDescription: "STEL-CD-NTG-CP-" },
+      { description: "STEL CD 02C 700x20 00304 STD", code: "STR2C7020ST00304", subDescription: "STEL-CD-000-CP-" },
+      { description: "STEL CD 02C 800x20 00304 FVP", code: "STR2C8020FV00304", subDescription: "STEL-CD-NTG-CP-" }
     ],
     gallery: []
   },

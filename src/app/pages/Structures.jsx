@@ -114,16 +114,18 @@ export function Structures() {
                                                     {model.description}
                                                 </p>
 
-                                                <div className="grid grid-cols-2 gap-4 mb-8">
-                                                    <div className="p-4 bg-secondary/50 rounded-xl">
-                                                        <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Capacity</div>
-                                                        <div className="text-lg font-mono">{model.capacity} kg</div>
+                                                {category.id !== "doors" && (
+                                                    <div className="grid grid-cols-2 gap-4 mb-8">
+                                                        <div className="p-4 bg-secondary/50 rounded-xl">
+                                                            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Capacity</div>
+                                                            <div className="text-lg font-mono">{model.capacity} kg</div>
+                                                        </div>
+                                                        <div className="p-4 bg-secondary/50 rounded-xl">
+                                                            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Speed</div>
+                                                            <div className="text-lg font-mono">{model.speed}</div>
+                                                        </div>
                                                     </div>
-                                                    <div className="p-4 bg-secondary/50 rounded-xl">
-                                                        <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Speed</div>
-                                                        <div className="text-lg font-mono">{model.speed}</div>
-                                                    </div>
-                                                </div>
+                                                )}
 
                                                 <div className="flex items-center justify-between pt-6 border-t border-border">
                                                     <div className="absolute right-0 bottom-0 overflow-hidden group/btn translate-x-12 group-hover:translate-x-0 transition-transform duration-500">
@@ -182,16 +184,18 @@ export function Structures() {
                                             </div>
 
                                             <div className="flex items-center gap-12">
-                                                <div className="hidden sm:grid grid-cols-2 gap-8">
-                                                    <div>
-                                                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Capacity</div>
-                                                        <div className="text-sm font-mono font-semibold">{model.capacity} kg</div>
+                                                {category.id !== "doors" && (
+                                                    <div className="hidden sm:grid grid-cols-2 gap-8">
+                                                        <div>
+                                                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Capacity</div>
+                                                            <div className="text-sm font-mono font-semibold">{model.capacity} kg</div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Speed</div>
+                                                            <div className="text-sm font-mono font-semibold">{model.speed}</div>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Speed</div>
-                                                        <div className="text-sm font-mono font-semibold">{model.speed}</div>
-                                                    </div>
-                                                </div>
+                                                )}
 
                                                 <div className="flex items-center gap-8">
                                                     <div className="text-right">

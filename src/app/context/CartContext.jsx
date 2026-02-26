@@ -4,8 +4,15 @@ const CartContext = createContext();
 
 export function CartProvider({ children }) {
     const [cart, setCart] = useState(() => {
-        const stored = localStorage.getItem("wittur_cart");
-        return stored ? JSON.parse(stored) : [];
+        try {
+            const stored = localStorage.getItem("wittur_cart");
+            if (!stored) return [];
+            const parsed = JSON.parse(stored);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            console.error("Failed to parse cart data", e);
+            return [];
+        }
     });
 
     useEffect(() => {
