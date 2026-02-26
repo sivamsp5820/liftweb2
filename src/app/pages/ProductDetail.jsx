@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router";
+import { useParams, Link, useNavigate, useLocation } from "react-router";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -7,15 +7,25 @@ import {
   Shield,
   Package,
   ChevronRight,
+  List,
 } from "lucide-react";
 import { liftModels, addons, liftCategories, liftSubcategories } from "../data/lifts";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { useCart } from "../context/CartContext";
+import { ShoppingCart } from "lucide-react";
 
 export function ProductDetail() {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSpecs, setSelectedSpecs] = useState({});
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const { addToCart } = useCart();
+  const [isAdded, setIsAdded] = useState(false);
+  const queryParams = new URLSearchParams(location.search);
+  const variantCode = queryParams.get("variant");
 
   const model = liftModels.find((m) => m.id === productId);
 
@@ -32,7 +42,13 @@ export function ProductDetail() {
       });
       setSelectedSpecs(initialSpecs);
     }
-  });
+    if (model && model.items && model.items.length > 0) {
+      const variant = variantCode
+        ? model.items.find(item => item.code === variantCode)
+        : model.items[0];
+      setSelectedItem(variant || model.items[0]);
+    }
+  }, [model, variantCode]);
   const subcategory = model ? liftSubcategories.find((s) => s.id === model.subcategoryId) : null;
   const category = subcategory ? liftCategories.find((c) => c.id === subcategory.categoryId) : null;
 
@@ -47,19 +63,35 @@ export function ProductDetail() {
     );
   }
 
-  const handleProceedToCheckout = () => {
-    // Store configuration in sessionStorage
-    sessionStorage.setItem(
-      "liftConfiguration",
-      JSON.stringify({
-        model,
-        subcategory,
-        category,
-        selectedSpecs,
-        total: model.price,
-      })
-    );
+  const handleAddToCart = () => {
+    addToCart({
+      model,
+      subcategory,
+      category,
+      selectedSpecs,
+      selectedItem,
+      selectedAddons: [],
+      total: model.price,
+    });
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    addToCart({
+      model,
+      subcategory,
+      category,
+      selectedSpecs,
+      selectedItem,
+      selectedAddons: [],
+      total: model.price,
+    });
     navigate("/checkout");
+  };
+
+  const handleProceedToCheckout = () => {
+    handleBuyNow();
   };
 
   const handleDownloadSpec = () => {
@@ -245,6 +277,7 @@ export function ProductDetail() {
               </button>
             </div>
 
+
             {/* Configuration Options (Selectable Specs) */}
             <div className="bg-card border border-border rounded-lg p-6">
               <h2 className="text-2xl mb-6 flex items-center gap-2">
@@ -304,8 +337,8 @@ export function ProductDetail() {
                   {/* Base Price */}
                   <div className="flex justify-between pb-4 border-b border-border">
                     <div>
-                      <div className="font-medium">{model.name}</div>
-                      <div className="text-sm text-muted-foreground">Base unit</div>
+                      <div className="font-medium">{selectedItem ? selectedItem.description : model.name}</div>
+                      <div className="text-sm text-muted-foreground">{selectedItem ? selectedItem.code : 'Base unit'}</div>
                     </div>
                     <div className="font-mono">${model.price.toLocaleString()}</div>
                   </div>
@@ -322,13 +355,48 @@ export function ProductDetail() {
 
                 {/* CTA Buttons */}
                 <div className="space-y-3">
-                  <button
-                    onClick={handleProceedToCheckout}
-                    className="w-full px-6 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
-                  >
-                    Proceed to Checkout
-                  </button>
-                  <button className="w-full px-6 py-3 border border-border rounded-lg hover:bg-secondary transition-colors">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={isAdded}
+                      className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-lg transition-all ${isAdded
+                        ? "bg-green-600 text-white"
+                        : "bg-secondary hover:bg-secondary/80 text-foreground"
+                        }`}
+                    >
+                      <AnimatePresence mode="wait">
+                        {isAdded ? (
+                          <motion.div
+                            key="check"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                          >
+                            <CheckCircle2 className="w-5 h-5" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="cart"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                          >
+                            <ShoppingCart className="w-5 h-5" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      <span className="font-semibold">
+                        {isAdded ? "Added to Cart" : "Add to Cart"}
+                      </span>
+                    </button>
+                    <button
+                      onClick={handleBuyNow}
+                      className="flex-1 px-6 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
+                  <button className="w-full px-6 py-3 border border-border rounded-lg hover:bg-secondary transition-colors text-sm">
                     Request Quote
                   </button>
                 </div>

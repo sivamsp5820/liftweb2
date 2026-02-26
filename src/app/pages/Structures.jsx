@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router";
-import { ArrowRight, ChevronRight, LayoutGrid, List } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { liftModels, liftCategories, liftSubcategories } from "../data/lifts";
 import { motion, AnimatePresence } from "motion/react";
 import { useViewMode } from "../context/ViewModeContext";
@@ -66,29 +66,6 @@ export function Structures() {
                             </p>
                         </div>
 
-                        {/* View Toggle */}
-                        <div className="flex bg-secondary/50 p-1 rounded-lg border border-border self-center md:self-auto">
-                            <button
-                                onClick={() => setViewMode('visual')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${viewMode === 'visual'
-                                    ? 'bg-background text-foreground shadow-sm'
-                                    : 'text-muted-foreground hook-mode-switch hover:text-foreground'
-                                    }`}
-                            >
-                                <LayoutGrid className="w-4 h-4" />
-                                <span className="text-sm font-medium">Visual</span>
-                            </button>
-                            <button
-                                onClick={() => setViewMode('technical')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${viewMode === 'technical'
-                                    ? 'bg-background text-foreground shadow-sm'
-                                    : 'text-muted-foreground hook-mode-switch hover:text-foreground'
-                                    }`}
-                            >
-                                <List className="w-4 h-4" />
-                                <span className="text-sm font-medium">Technical</span>
-                            </button>
-                        </div>
                     </motion.div>
                 </div>
             </section>
@@ -113,7 +90,10 @@ export function Structures() {
                                         transition={{ delay: index * 0.2 }}
                                     >
                                         <Link
-                                            to={`/product/${model.id}`}
+                                            to={model.items && model.items.length > 0
+                                                ? `/category/${categoryId}/${subcategoryId}/${model.id}/variants`
+                                                : `/product/${model.id}`
+                                            }
                                             className="group block bg-card border border-border rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300"
                                         >
                                             <div className="relative h-80 overflow-hidden bg-muted">
@@ -146,9 +126,10 @@ export function Structures() {
                                                 </div>
 
                                                 <div className="flex items-center justify-between pt-6 border-t border-border">
-                                                    <div className="text-primary font-medium flex items-center gap-2">
-                                                        <span>View Specifications</span>
-                                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                                                    <div className="absolute right-0 bottom-0 overflow-hidden group/btn translate-x-12 group-hover:translate-x-0 transition-transform duration-500">
+                                                        <div className="bg-primary text-primary-foreground font-bold px-6 py-3 flex items-center gap-2 rounded-tl-2xl">
+                                                            Configure <ArrowRight className="w-5 h-5" />
+                                                        </div>
                                                     </div>
                                                     <div className="text-2xl font-mono">
                                                         ${model.price.toLocaleString()}
@@ -170,12 +151,20 @@ export function Structures() {
                                 {models.map((model, index) => (
                                     <motion.div
                                         key={model.id}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
+                                        variants={{
+                                            initial: { opacity: 0, x: -20 },
+                                            animate: { opacity: 1, x: 0 }
+                                        }}
+                                        initial="initial"
+                                        animate="animate"
+                                        whileHover="hover"
                                         transition={{ delay: index * 0.05 }}
                                     >
                                         <Link
-                                            to={`/product/${model.id}`}
+                                            to={model.items && model.items.length > 0
+                                                ? `/category/${categoryId}/${subcategoryId}/${model.id}/variants`
+                                                : `/product/${model.id}`
+                                            }
                                             className="group flex flex-col md:flex-row md:items-center justify-between p-8 bg-card border border-border rounded-2xl hover:border-primary/50 hover:shadow-lg transition-all gap-8"
                                         >
                                             <div className="flex-1">
@@ -209,7 +198,7 @@ export function Structures() {
                                                         <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Price From</div>
                                                         <div className="text-xl font-mono font-bold">${model.price.toLocaleString()}</div>
                                                     </div>
-                                                    <div className="w-12 h-12 flex items-center justify-center bg-primary/5 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                                                    <div className="w-12 h-12 flex items-center justify-center bg-primary/5 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 flex-shrink-0">
                                                         <ArrowRight className="w-5 h-5" />
                                                     </div>
                                                 </div>

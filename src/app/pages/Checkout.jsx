@@ -13,10 +13,11 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+import { useCart } from "../context/CartContext";
+
 export function Checkout() {
   const navigate = useNavigate();
-  const [configuration, setConfiguration] = useState(null);
-  const [currentStep, setCurrentStep] = useState(1);
+  const { cart, cartTotal, clearCart } = useCart();
 
   const {
     register,
@@ -30,36 +31,52 @@ export function Checkout() {
     },
   });
 
-  const paymentMethod = watch("paymentMethod");
+  const formData = watch();
+
+  const isStepCompleted = (stepNumber) => {
+    if (stepNumber === 1) return cart.length > 0;
+    if (stepNumber === 2) {
+      return !!(formData.firstName && formData.lastName && formData.email && formData.phone);
+    }
+    if (stepNumber === 3) {
+      return !!(formData.street && formData.city && formData.state && formData.zipCode && formData.country && formData.buildingFloors);
+    }
+    if (stepNumber === 4) {
+      return !!formData.paymentMethod;
+    }
+    return false;
+  };
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("liftConfiguration");
-    if (stored) {
-      setConfiguration(JSON.parse(stored));
-    } else {
-      // Redirect if no configuration
-      navigate("/categories");
+    if (cart.length === 0) {
+      // If no items in cart, and not loading, redirect
+      const timer = setTimeout(() => {
+        if (cart.length === 0) navigate("/categories");
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [navigate]);
+  }, [cart, navigate]);
 
   const onSubmit = (data) => {
     // Store order data
     sessionStorage.setItem(
       "orderData",
       JSON.stringify({
-        configuration,
+        cart,
         customerDetails: data,
+        total: cartTotal,
         orderDate: new Date().toISOString(),
         orderNumber: `ELV-${Date.now()}`,
       })
     );
+    clearCart();
     navigate("/confirmation");
   };
 
-  if (!configuration) {
+  if (cart.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <p>Loading...</p>
+        <p>Loading configuration...</p>
       </div>
     );
   }
@@ -82,97 +99,129 @@ export function Checkout() {
           </p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="mb-12">
-          <div className="flex items-center justify-center">
-            {steps.map((step, idx) => (
-              <div key={step.number} className="flex items-center">
-                <div
-                  className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${currentStep >= step.number
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card border border-border"
-                    }`}
-                >
-                  <step.icon className="w-5 h-5" />
-                  <span className="hidden md:inline text-sm">{step.title}</span>
-                </div>
-                {idx < steps.length - 1 && (
-                  <div
-                    className={`w-12 h-0.5 mx-2 ${currentStep > step.number ? "bg-primary" : "bg-border"
-                      }`}
-                  />
-                )}
-              </div>
-            ))}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 items-start">
+          {/* Mobile Progress Stepper */}
+          <div className="lg:hidden mb-12">
+            <div className="flex items-center justify-center gap-2">
+              {steps.map((step, idx) => {
+                const completed = isStepCompleted(step.number);
+                return (
+                  <div key={step.number} className="flex items-center">
+                    <div
+                      className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-500 ${completed
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-card border border-border text-muted-foreground opacity-50"
+                        }`}
+                    >
+                      <step.icon className="w-4 h-4" />
+                    </div>
+                    {idx < steps.length - 1 && (
+                      <div
+                        className={`w-4 h-0.5 mx-1 transition-colors duration-500 ${isStepCompleted(step.number + 1) ? "bg-primary" : "bg-border"
+                          }`}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Vertical Progress Side-rail (Desktop) */}
+          <div className="lg:col-span-1 hidden lg:block sticky top-24">
+            <div className="relative">
+              {/* Vertical Connector Line Base */}
+              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-border/50" />
+
+              <div className="space-y-16">
+                {steps.map((step, idx) => {
+                  const completed = isStepCompleted(step.number);
+                  const isNextCompleted = idx < steps.length - 1 && isStepCompleted(steps[idx + 1].number);
+
+                  return (
+                    <div key={step.number} className="relative flex items-center gap-6 group">
+                      {/* Active Connector Segment */}
+                      {idx < steps.length - 1 && isNextCompleted && (
+                        <div className="absolute left-[23px] top-12 h-16 w-0.5 bg-primary z-10 transition-all duration-700" />
+                      )}
+
+                      <div
+                        className={`relative z-20 flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-500 shadow-sm ${completed
+                          ? "bg-primary text-primary-foreground scale-110 shadow-primary/20"
+                          : "bg-card border border-border text-muted-foreground"
+                          }`}
+                      >
+                        <step.icon className="w-5 h-5" />
+                        {completed && step.number !== 4 && (
+                          <div className="absolute -right-1 -top-1 bg-background rounded-full p-0.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col">
+                        <span className={`text-[10px] uppercase tracking-[0.2em] font-bold transition-colors duration-500 ${completed ? "text-primary" : "text-muted-foreground/40"
+                          }`}>
+                          Section {step.number}
+                        </span>
+                        <span className={`text-sm font-semibold transition-colors duration-500 ${completed ? "text-foreground" : "text-muted-foreground/60"
+                          }`}>
+                          {step.title}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
           {/* Main Form */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Step 1: Configuration Summary */}
+              {/* Configuration Summary - Now Multi-item */}
               <div className="bg-card border border-border rounded-lg p-6">
                 <h2 className="text-2xl mb-6 flex items-center gap-2">
                   <Package className="w-6 h-6" />
-                  Configuration Summary
+                  Order Review
                 </h2>
 
-                {/* Selected Model */}
-                <div className="mb-6 p-4 bg-secondary/30 rounded-lg">
-                  <div className="flex gap-4">
-                    <img
-                      src={configuration.model.image}
-                      alt={configuration.model.name}
-                      className="w-24 h-24 object-cover rounded"
-                    />
-                    <div className="flex-1">
-                      <div className="text-sm text-muted-foreground mb-1">
-                        {configuration.category.name} → {configuration.subcategory.name}
-                      </div>
-                      <h3 className="text-xl mb-2">{configuration.model.name}</h3>
-                      <div className="grid grid-cols-3 gap-2 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Capacity:</span>{" "}
-                          {configuration.model.capacity}kg
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Speed:</span>{" "}
-                          {configuration.model.speed}
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Passengers:</span>{" "}
-                          {configuration.model.passengers}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Selected Add-ons */}
-                {configuration.selectedAddons.length > 0 && (
-                  <div>
-                    <h3 className="text-sm uppercase tracking-wide text-muted-foreground mb-3">
-                      Selected Add-ons
-                    </h3>
-                    <div className="space-y-2">
-                      {configuration.selectedAddons.map((addon) => (
-                        <div
-                          key={addon.id}
-                          className="flex items-center justify-between p-3 bg-secondary/30 rounded"
-                        >
-                          <div>
-                            <div className="font-medium">{addon.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {addon.category}
+                <div className="space-y-6">
+                  {cart.map((item) => (
+                    <div key={item.cartId} className="p-4 bg-secondary/30 rounded-lg border border-border/50">
+                      <div className="flex gap-4">
+                        <img
+                          src={item.model.image}
+                          alt={item.model.name}
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start mb-1">
+                            <div>
+                              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                                {item.category.name} → {item.subcategory.name}
+                              </div>
+                              <h3 className="text-lg font-semibold truncate">{item.model.name}</h3>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-mono font-bold">${(item.total * item.quantity).toLocaleString()}</div>
+                              <div className="text-[10px] text-muted-foreground">Qty: {item.quantity}</div>
                             </div>
                           </div>
-                          <div className="font-mono">+${addon.price.toLocaleString()}</div>
+
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 mt-2">
+                            {Object.entries(item.selectedSpecs).slice(0, 3).map(([key, val]) => (
+                              <div key={key} className="text-[10px] flex gap-1 items-center">
+                                <span className="text-muted-foreground uppercase">{key}:</span>
+                                <span className="font-semibold truncate">{val}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
 
               {/* Step 2: Customer Details */}
@@ -451,7 +500,7 @@ export function Checkout() {
                   type="submit"
                   className="flex-1 px-8 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
                 >
-                  {paymentMethod === "quote" ? "Submit Quote Request" : "Continue to Payment"}
+                  {formData.paymentMethod === "quote" ? "Submit Quote Request" : "Continue to Payment"}
                 </button>
               </div>
             </form>
@@ -463,49 +512,39 @@ export function Checkout() {
               <h3 className="text-xl mb-6">Order Summary</h3>
 
               <div className="space-y-4 mb-6">
-                <div className="flex justify-between pb-4 border-b border-border">
-                  <div>
-                    <div className="font-medium">{configuration.model.name}</div>
-                    <div className="text-sm text-muted-foreground">Base unit</div>
+                {cart.map((item) => (
+                  <div key={item.cartId} className="flex justify-between text-sm pb-2 border-b border-border/50">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <div className="font-medium truncate">{item.model.name}</div>
+                      <div className="text-[10px] text-muted-foreground uppercase">Qty: {item.quantity} × ${item.total.toLocaleString()}</div>
+                    </div>
+                    <div className="font-mono">${(item.total * item.quantity).toLocaleString()}</div>
                   </div>
-                  <div className="font-mono">
-                    ${configuration.model.price.toLocaleString()}
-                  </div>
-                </div>
-
-                {configuration.selectedAddons.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-sm text-muted-foreground">Add-ons:</div>
-                    {configuration.selectedAddons.map((addon) => (
-                      <div key={addon.id} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">{addon.name}</span>
-                        <span className="font-mono">+${addon.price.toLocaleString()}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                ))}
 
                 <div className="flex justify-between pt-4 border-t-2 border-primary">
-                  <div className="text-sm uppercase tracking-wide">Total</div>
-                  <div className="text-2xl font-mono">
-                    ${configuration.total.toLocaleString()}
+                  <div>
+                    <div className="text-sm font-bold uppercase tracking-wider">
+                      Total Amount
+                    </div>
                   </div>
+                  <div className="text-2xl font-mono font-bold">${cartTotal.toLocaleString()}</div>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
-                  <span>Price includes base installation</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
-                  <span>5-year warranty</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
-                  <span>Free first-year maintenance</span>
-                </div>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
+                <span>Price includes base installation</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
+                <span>5-year warranty</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
+                <span>Free first-year maintenance</span>
               </div>
             </div>
           </div>

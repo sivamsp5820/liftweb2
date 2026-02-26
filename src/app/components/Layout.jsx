@@ -1,8 +1,10 @@
 import { Outlet, Link, useLocation } from "react-router";
 import { Building2, ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useCart } from "../context/CartContext";
 
 export function Layout() {
+  const { cartCount } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -43,10 +45,18 @@ export function Layout() {
               >
                 Products
               </Link>
-              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity">
+              <Link
+                to="/cart"
+                className="relative flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+              >
                 <ShoppingCart className="w-4 h-4" />
-                <span className="text-sm">Cart</span>
-              </button>
+                <span className="text-sm font-semibold">Cart</span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full border-2 border-white font-bold animate-in zoom-in duration-300">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -78,10 +88,14 @@ export function Layout() {
                 >
                   Products
                 </Link>
-                <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg justify-center">
-                  <ShoppingCart className="w-4 h-4" />
-                  <span className="text-sm">Cart</span>
-                </button>
+                <Link
+                  to="/cart"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg justify-center relative"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  <span className="text-sm font-semibold">Cart ({cartCount})</span>
+                </Link>
               </div>
             </div>
           )}

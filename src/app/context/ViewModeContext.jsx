@@ -5,7 +5,7 @@ const ViewModeContext = createContext(undefined);
 export const ViewModeProvider = ({ children }) => {
     const [viewMode, setViewModeState] = useState(() => {
         const saved = localStorage.getItem('wittur_view_mode');
-        return saved || 'visual';
+        return saved || 'technical';
     });
 
     const setViewMode = (mode) => {
