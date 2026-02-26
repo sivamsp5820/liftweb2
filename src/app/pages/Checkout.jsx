@@ -11,13 +11,28 @@ import {
   CreditCard,
   FileText,
   CheckCircle2,
+  Plus,
+  Minus,
+  Trash2,
+  ChevronDown,
 } from "lucide-react";
 
 import { useCart } from "../context/CartContext";
+import { motion, AnimatePresence } from "motion/react";
 
 export function Checkout() {
   const navigate = useNavigate();
-  const { cart, cartTotal, clearCart } = useCart();
+  const { cart, cartTotal, clearCart, updateQuantity, removeFromCart } = useCart();
+  const [expandedItems, setExpandedItems] = useState(new Set());
+
+  const toggleExpand = (cartId) => {
+    setExpandedItems(prev => {
+      const next = new Set(prev);
+      if (next.has(cartId)) next.delete(cartId);
+      else next.add(cartId);
+      return next;
+    });
+  };
 
   const {
     register,
@@ -204,18 +219,69 @@ export function Checkout() {
                               <h3 className="text-lg font-semibold truncate">{item.model.name}</h3>
                             </div>
                             <div className="text-right">
-                              <div className="text-sm font-mono font-bold">${(item.total * item.quantity).toLocaleString()}</div>
-                              <div className="text-[10px] text-muted-foreground">Qty: {item.quantity}</div>
+                              <div className="text-sm font-mono font-bold mb-2">${(item.total * item.quantity).toLocaleString()}</div>
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => updateQuantity(item.cartId, -1)}
+                                  className="p-1 hover:bg-secondary rounded border border-border"
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </button>
+                                <span className="text-xs font-mono font-bold w-4 text-center">{item.quantity}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateQuantity(item.cartId, 1)}
+                                  className="p-1 hover:bg-secondary rounded border border-border"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => removeFromCart(item.cartId)}
+                                  className="ml-2 p-1 text-muted-foreground hover:text-destructive transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 mt-2">
-                            {Object.entries(item.selectedSpecs).slice(0, 3).map(([key, val]) => (
-                              <div key={key} className="text-[10px] flex gap-1 items-center">
-                                <span className="text-muted-foreground uppercase">{key}:</span>
-                                <span className="font-semibold truncate">{val}</span>
-                              </div>
-                            ))}
+                          <div className="mt-4">
+                            <button
+                              type="button"
+                              onClick={() => toggleExpand(item.cartId)}
+                              className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest text-primary font-bold hover:opacity-80 transition-opacity"
+                            >
+                              <span>{expandedItems.has(item.cartId) ? "Hide Details" : "View Details"}</span>
+                              <ChevronDown className={`w-2.5 h-2.5 transition-transform duration-300 ${expandedItems.has(item.cartId) ? "rotate-180" : ""}`} />
+                            </button>
+
+                            <AnimatePresence>
+                              {expandedItems.has(item.cartId) && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="bg-background/50 rounded p-3 mt-3 border border-border/30">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
+                                      {Object.entries(item.selectedSpecs).map(([key, val]) => (
+                                        <div key={key} className="flex flex-col min-w-0">
+                                          <span className="text-[11px] uppercase tracking-tight text-muted-foreground/60 font-medium truncate">
+                                            {key}
+                                          </span>
+                                          <span className="text-sm font-bold text-foreground/80 truncate">
+                                            {val}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
                         </div>
                       </div>
@@ -513,12 +579,30 @@ export function Checkout() {
 
               <div className="space-y-4 mb-6">
                 {cart.map((item) => (
-                  <div key={item.cartId} className="flex justify-between text-sm pb-2 border-b border-border/50">
+                  <div key={item.cartId} className="flex justify-between items-center text-sm pb-2 border-b border-border/50">
                     <div className="flex-1 min-w-0 pr-4">
                       <div className="font-medium truncate">{item.model.name}</div>
-                      <div className="text-[10px] text-muted-foreground uppercase">Qty: {item.quantity} × ${item.total.toLocaleString()}</div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.cartId, -1)}
+                          className="p-0.5 hover:bg-secondary rounded"
+                        >
+                          <Minus className="w-2.5 h-2.5" />
+                        </button>
+                        <span className="text-[10px] font-mono leading-none">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.cartId, 1)}
+                          className="p-0.5 hover:bg-secondary rounded"
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="font-mono">${(item.total * item.quantity).toLocaleString()}</div>
+                    <div className="font-mono text-right">
+                      <div className="leading-none">${(item.total * item.quantity).toLocaleString()}</div>
+                    </div>
                   </div>
                 ))}
 

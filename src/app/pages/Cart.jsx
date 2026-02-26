@@ -1,11 +1,22 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useCart } from "../context/CartContext";
-import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Package } from "lucide-react";
+import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Package, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export function Cart() {
     const { cart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
     const navigate = useNavigate();
+    const [expandedItems, setExpandedItems] = useState(new Set());
+
+    const toggleExpand = (cartId) => {
+        setExpandedItems(prev => {
+            const next = new Set(prev);
+            if (next.has(cartId)) next.delete(cartId);
+            else next.add(cartId);
+            return next;
+        });
+    };
 
     if (cart.length === 0) {
         return (
@@ -94,14 +105,40 @@ export function Cart() {
                                             </button>
                                         </div>
 
-                                        {/* Technical Specs Summary */}
-                                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mb-6">
-                                            {Object.entries(item.selectedSpecs).map(([key, val]) => (
-                                                <div key={key} className="flex gap-1 border-r border-border pr-4 last:border-0 uppercase tracking-tighter">
-                                                    <span className="opacity-60">{key}:</span>
-                                                    <span className="font-semibold text-foreground/80">{val}</span>
-                                                </div>
-                                            ))}
+                                        <div className="mb-6">
+                                            <button
+                                                onClick={() => toggleExpand(item.cartId)}
+                                                className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-primary font-bold hover:opacity-80 transition-opacity mb-2"
+                                            >
+                                                <span>{expandedItems.has(item.cartId) ? "Hide Specifications" : "View Specifications"}</span>
+                                                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${expandedItems.has(item.cartId) ? "rotate-180" : ""}`} />
+                                            </button>
+
+                                            <AnimatePresence>
+                                                {expandedItems.has(item.cartId) && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <div className="bg-secondary/30 rounded-lg p-4 mt-2">
+                                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-3">
+                                                                {Object.entries(item.selectedSpecs).map(([key, val]) => (
+                                                                    <div key={key} className="flex flex-col min-w-0">
+                                                                        <span className="text-[11px] uppercase tracking-tight text-muted-foreground/70 font-medium truncate">
+                                                                            {key}
+                                                                        </span>
+                                                                        <span className="text-sm font-bold text-foreground/90 truncate">
+                                                                            {val}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
 
                                         <div className="flex items-center justify-between mt-auto">
