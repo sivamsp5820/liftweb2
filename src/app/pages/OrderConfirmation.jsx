@@ -257,7 +257,7 @@ export function OrderConfirmation() {
                   <div>
                     <div className="font-medium">Site Assessment (3-5 days)</div>
                     <div className="text-sm text-primary-foreground/80">
-                      Technical team evaluates installation requirements
+                      Technical Team evaluates installation requirements
                     </div>
                   </div>
                 </div>
