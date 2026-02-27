@@ -119,7 +119,7 @@ export function SubCategory() {
               >
                 {subcategories.map((subcat, index) => {
                   const targetUrl = category.id === 'doors'
-                    ? `/category/${categoryId}/${subcat.id}/structures`
+                    ? `/categories?category=${categoryId}&subcategory=${subcat.id}`
                     : `/product/${liftModels.find(m => m.subcategoryId === subcat.id)?.id || ''}`;
 
                   return (
@@ -153,7 +153,7 @@ export function SubCategory() {
 
                           <div className="flex items-center justify-between mt-auto">
                             <div className="flex items-center gap-2 text-primary font-medium">
-                              <span>{category.id === 'doors' ? 'View Structures' : 'View Details'}</span>
+                              <span>{category.id === 'doors' ? 'View Products' : 'View Details'}</span>
                               <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                             </div>
 
@@ -222,7 +222,7 @@ export function SubCategory() {
               >
                 {subcategories.map((subcat, index) => {
                   const targetUrl = category.id === 'doors'
-                    ? `/category/${categoryId}/${subcat.id}/structures`
+                    ? `/categories?category=${categoryId}&subcategory=${subcat.id}`
                     : `/product/${liftModels.find(m => m.subcategoryId === subcat.id)?.id || ''}`;
 
                   return (

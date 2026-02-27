@@ -288,50 +288,71 @@ export function ProductDetail() {
             </div>
 
 
-            {/* Configuration Options (Selectable Specs) */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <h2 className="text-2xl mb-6 flex items-center gap-2">
-                <Package className="w-6 h-6" />
-                Customize Specifications
-              </h2>
-              <div className="grid grid-cols-1 gap-8">
-                {Object.entries(model.specifications).map(([key, value]) => {
-                  if (!Array.isArray(value) || value.length <= 1) {
-                    return (
-                      <div key={key} className="pb-4 border-b border-border">
-                        <div className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
-                          {key.replace(/([A-Z])/g, " $1").trim()}
-                        </div>
-                        <div className="font-mono text-lg">{Array.isArray(value) ? value[0] : value}</div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div key={key} className="space-y-4">
-                      <div className="text-sm text-muted-foreground uppercase tracking-wide">
+            {variantCode ? (
+              <div className="bg-card border border-border rounded-lg p-6 mt-8">
+                <h2 className="text-2xl mb-6 flex items-center gap-2">
+                  <List className="w-6 h-6" />
+                  Technical Specifications
+                </h2>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  {Object.entries(model.specifications).map(([key, value]) => (
+                    <div key={key} className="p-4 bg-secondary/30 rounded-lg">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                         {key.replace(/([A-Z])/g, " $1").trim()}
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {value.map((option) => (
-                          <button
-                            key={option}
-                            onClick={() => setSelectedSpecs(prev => ({ ...prev, [key]: option }))}
-                            className={`px-4 py-2 rounded-md border transition-all text-sm font-medium ${selectedSpecs[key] === option
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border hover:border-muted-foreground text-muted-foreground"
-                              }`}
-                          >
-                            {option}
-                            {key.toLowerCase().includes('width') || key.toLowerCase().includes('height') ? ' mm' : ''}
-                          </button>
-                        ))}
+                      <div className="text-lg font-mono leading-tight break-words">
+                        {Array.isArray(value) ? value.join(", ") : value}
+                        {key.toLowerCase().includes('width') || key.toLowerCase().includes('height') ? ' mm' : ''}
                       </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-card border border-border rounded-lg p-6 mt-8">
+                <h2 className="text-2xl mb-6 flex items-center gap-2">
+                  <Package className="w-6 h-6" />
+                  Customize Specifications
+                </h2>
+                <div className="grid grid-cols-1 gap-8">
+                  {Object.entries(model.specifications).map(([key, value]) => {
+                    if (!Array.isArray(value) || value.length <= 1) {
+                      return (
+                        <div key={key} className="pb-4 border-b border-border">
+                          <div className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
+                            {key.replace(/([A-Z])/g, " $1").trim()}
+                          </div>
+                          <div className="font-mono text-lg">{Array.isArray(value) ? value[0] : value}</div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div key={key} className="space-y-4">
+                        <div className="text-sm text-muted-foreground uppercase tracking-wide">
+                          {key.replace(/([A-Z])/g, " $1").trim()}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {value.map((option) => (
+                            <button
+                              key={option}
+                              onClick={() => setSelectedSpecs(prev => ({ ...prev, [key]: option }))}
+                              className={`px-4 py-2 rounded-md border transition-all text-sm font-medium ${selectedSpecs[key] === option
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border hover:border-muted-foreground text-muted-foreground"
+                                }`}
+                            >
+                              {option}
+                              {key.toLowerCase().includes('width') || key.toLowerCase().includes('height') ? ' mm' : ''}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Price Summary Sidebar - Sticky */}
@@ -431,6 +452,6 @@ export function ProductDetail() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
