@@ -95,7 +95,7 @@ export function ProductDetail() {
   };
 
   const handleDownloadSpec = () => {
-    alert("Spec sheet download would start here. In production, this would download a PDF.");
+    alert("Spec sheet download would start here. In production, this would download a PDF plese check make sure it is verfied as the data you have choosed.");
   };
 
   // Dynamic Quick Specs mapping

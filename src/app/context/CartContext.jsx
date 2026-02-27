@@ -10,7 +10,7 @@ export function CartProvider({ children }) {
             const parsed = JSON.parse(stored);
             return Array.isArray(parsed) ? parsed : [];
         } catch (e) {
-            console.error("Failed to parse cart data", e);
+            console.error("Failed to parse cart data yessss", e);
             return [];
         }
     });

@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext";
 export function SubCategory() {
   const { categoryId } = useParams();
   const navigate = useNavigate();
+  const { viewMode, setViewMode } = useViewMode();
   const { addToCart } = useCart();
 
   const calculateDefaultSpecs = (model) => {
