@@ -26,12 +26,26 @@ export function Variants() {
         );
     }
 
+    const getDefaultSpecs = () => {
+        if (!model || !model.specifications) return {};
+        const initialSpecs = {};
+        Object.entries(model.specifications).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+                initialSpecs[key] = value[0];
+            } else {
+                initialSpecs[key] = value;
+            }
+        });
+        return initialSpecs;
+    };
+
+    const defaultSpecs = getDefaultSpecs();
     const items = model.items || [];
 
     const getCartItem = (item) => {
         return cart.find((i) =>
             i.model.id === model.id &&
-            JSON.stringify(i.selectedSpecs) === "{}" &&
+            JSON.stringify(i.selectedSpecs) === JSON.stringify(defaultSpecs) &&
             i.selectedItem?.code === item.code
         );
     };
@@ -131,7 +145,7 @@ export function Variants() {
                                                             model,
                                                             subcategory,
                                                             category,
-                                                            selectedSpecs: {},
+                                                            selectedSpecs: defaultSpecs,
                                                             selectedItem: item,
                                                             selectedAddons: [],
                                                             total: model.price,
@@ -189,7 +203,7 @@ export function Variants() {
                                                                 model,
                                                                 subcategory,
                                                                 category,
-                                                                selectedSpecs: {},
+                                                                selectedSpecs: defaultSpecs,
                                                                 selectedItem: item,
                                                                 selectedAddons: [],
                                                                 total: model.price,

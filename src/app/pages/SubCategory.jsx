@@ -8,8 +8,20 @@ import { useCart } from "../context/CartContext";
 export function SubCategory() {
   const { categoryId } = useParams();
   const navigate = useNavigate();
-  const { viewMode, setViewMode } = useViewMode();
   const { addToCart } = useCart();
+
+  const calculateDefaultSpecs = (model) => {
+    if (!model || !model.specifications) return {};
+    const initialSpecs = {};
+    Object.entries(model.specifications).forEach(([key, value]) => {
+      if (Array.isArray(value) && value.length > 0) {
+        initialSpecs[key] = value[0];
+      } else {
+        initialSpecs[key] = value;
+      }
+    });
+    return initialSpecs;
+  };
 
   const category = liftCategories.find((c) => c.id === categoryId);
   const subcategories = liftSubcategories.filter((s) => s.categoryId === categoryId);
@@ -156,7 +168,7 @@ export function SubCategory() {
                                       model,
                                       subcategory: subcat,
                                       category,
-                                      selectedSpecs: {},
+                                      selectedSpecs: calculateDefaultSpecs(model),
                                       selectedItem: model.items?.[0] || null,
                                       selectedAddons: [],
                                       total: model.price,
@@ -178,7 +190,7 @@ export function SubCategory() {
                                       model,
                                       subcategory: subcat,
                                       category,
-                                      selectedSpecs: {},
+                                      selectedSpecs: calculateDefaultSpecs(model),
                                       selectedItem: model.items?.[0] || null,
                                       selectedAddons: [],
                                       total: model.price,
