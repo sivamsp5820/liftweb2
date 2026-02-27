@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router";
-import { ArrowLeft, ChevronRight, Plus, Settings } from "lucide-react";
+import { ArrowLeft, ChevronRight, Plus, Minus } from "lucide-react";
 import { liftModels, liftCategories, liftSubcategories } from "../data/lifts";
 import { motion, AnimatePresence } from "motion/react";
 import { useViewMode } from "../context/ViewModeContext";
@@ -9,7 +9,7 @@ export function Variants() {
     const { categoryId, subcategoryId, productId } = useParams();
     const navigate = useNavigate();
     const { viewMode, setViewMode } = useViewMode();
-    const { addToCart } = useCart();
+    const { cart, addToCart, updateQuantity, removeFromCart } = useCart();
 
     const category = liftCategories.find((c) => c.id === categoryId);
     const subcategory = liftSubcategories.find((s) => s.id === subcategoryId);
@@ -27,6 +27,14 @@ export function Variants() {
     }
 
     const items = model.items || [];
+
+    const getCartItem = (item) => {
+        return cart.find((i) =>
+            i.model.id === model.id &&
+            JSON.stringify(i.selectedSpecs) === "{}" &&
+            i.selectedItem?.code === item.code
+        );
+    };
 
     return (
         <div className="w-full">
@@ -85,6 +93,14 @@ export function Variants() {
             {/* Content */}
             <section className="py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-end mb-8">
+                        <Link
+                            to={`/product/${model.id}`}
+                            className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-primary text-primary-foreground rounded-xl transition-all font-semibold shadow-lg hover:opacity-90 whitespace-nowrap"
+                        >
+                            <span>Choose New Combo</span>
+                        </Link>
+                    </div>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={viewMode}
@@ -93,71 +109,114 @@ export function Variants() {
                             exit={{ opacity: 0, x: viewMode === 'visual' ? 20 : -20 }}
                             className={viewMode === 'visual' ? "grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto" : "max-w-5xl mx-auto space-y-4"}
                         >
-                            {items.map((item, index) => (
-                                <motion.div
-                                    key={item.code}
-                                    variants={{
-                                        initial: { opacity: 0, y: 20 },
-                                        animate: { opacity: 1, y: 0 }
-                                    }}
-                                    initial="initial"
-                                    animate="animate"
-                                    whileHover="hover"
-                                    transition={{ delay: index * 0.05 }}
-                                >
-                                    <div className="group flex flex-col md:flex-row md:items-center gap-4">
-                                        <div className="flex-1 flex items-center justify-between gap-6 bg-card border border-border rounded-2xl p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl">
-                                            <Link
-                                                to={`/product/${model.id}?variant=${item.code}`}
-                                                className="flex-1"
-                                            >
-                                                <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">
-                                                    {subcategory.name}
-                                                </div>
-                                                <h3 className="text-xl md:text-2xl font-medium group-hover:text-primary transition-colors mb-4 line-clamp-2">
-                                                    {item.description}
-                                                </h3>
-                                                <div className="text-xs text-muted-foreground uppercase tracking-widest mb-1 font-semibold">
-                                                    Specifications
-                                                </div>
-                                                <div className="text-sm font-mono text-muted-foreground">
-                                                    ({item.code} / {item.subDescription})
-                                                </div>
-                                            </Link>
-
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    addToCart({
-                                                        model,
-                                                        subcategory,
-                                                        category,
-                                                        selectedSpecs: {},
-                                                        selectedItem: item,
-                                                        selectedAddons: [],
-                                                        total: model.price,
-                                                    });
+                            {items.map((item, index) => {
+                                const cartItem = getCartItem(item);
+                                return (
+                                    <motion.div
+                                        key={item.code}
+                                        variants={{
+                                            initial: { opacity: 0, y: 20 },
+                                            animate: { opacity: 1, y: 0 }
+                                        }}
+                                        initial="initial"
+                                        animate="animate"
+                                        whileHover="hover"
+                                        transition={{ delay: index * 0.05 }}
+                                    >
+                                        <div className="group flex flex-col md:flex-row md:items-center gap-4">
+                                            <div
+                                                onClick={() => {
+                                                    if (!cartItem) {
+                                                        addToCart({
+                                                            model,
+                                                            subcategory,
+                                                            category,
+                                                            selectedSpecs: {},
+                                                            selectedItem: item,
+                                                            selectedAddons: [],
+                                                            total: model.price,
+                                                        });
+                                                    } else {
+                                                        updateQuantity(cartItem.cartId, 1);
+                                                    }
                                                 }}
-                                                className="w-12 h-12 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
-                                                title="Add to Cart"
+                                                className="flex-1 flex items-center justify-between gap-6 bg-card border border-border rounded-2xl p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl cursor-pointer"
                                             >
-                                                <Plus className="w-5 h-5" />
-                                            </button>
-                                        </div>
+                                                <div className="flex-1">
+                                                    <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">
+                                                        {subcategory.name}
+                                                    </div>
+                                                    <h3 className="text-xl md:text-2xl font-medium group-hover:text-primary transition-colors mb-4 line-clamp-2">
+                                                        {item.description}
+                                                    </h3>
+                                                    <div className="text-xs text-muted-foreground uppercase tracking-widest mb-1 font-semibold">
+                                                        Specifications
+                                                    </div>
+                                                    <div className="text-sm font-mono text-muted-foreground">
+                                                        ({item.code} / {item.subDescription})
+                                                    </div>
+                                                </div>
 
-                                        <button
-                                            onClick={() => navigate(`/product/${model.id}?variant=${item.code}`)}
-                                            className="w-full md:w-auto flex items-center justify-center gap-2 py-3 px-6 bg-primary text-primary-foreground rounded-xl transition-all font-semibold opacity-0 translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:pointer-events-auto whitespace-nowrap shadow-lg"
-                                        >
-                                            <Settings className="w-4 h-4 animate-spin-slow" />
-                                            <span>Configure Property</span>
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            ))}
+                                                {cartItem ? (
+                                                    <div className="flex items-center gap-3 bg-secondary rounded-full p-1" onClick={(e) => e.stopPropagation()}>
+                                                        <button
+                                                            onClick={() => {
+                                                                if (cartItem.quantity > 1) {
+                                                                    updateQuantity(cartItem.cartId, -1);
+                                                                } else {
+                                                                    removeFromCart(cartItem.cartId);
+                                                                }
+                                                            }}
+                                                            className="w-10 h-10 flex items-center justify-center bg-background hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                                                        >
+                                                            <Minus className="w-4 h-4" />
+                                                        </button>
+                                                        <span className="w-4 text-center font-medium">
+                                                            {cartItem.quantity}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => updateQuantity(cartItem.cartId, 1)}
+                                                            className="w-10 h-10 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all shadow-sm flex-shrink-0"
+                                                        >
+                                                            <Plus className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            addToCart({
+                                                                model,
+                                                                subcategory,
+                                                                category,
+                                                                selectedSpecs: {},
+                                                                selectedItem: item,
+                                                                selectedAddons: [],
+                                                                total: model.price,
+                                                            });
+                                                        }}
+                                                        className="w-12 h-12 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                                                        title="Add to Cart"
+                                                    >
+                                                        <Plus className="w-5 h-5" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )
+                            })}
                         </motion.div>
                     </AnimatePresence>
+
+                    <div className="mt-12 flex justify-center">
+                        <Link
+                            to="/categories"
+                            className="inline-flex items-center justify-center gap-2 py-4 px-8 bg-primary text-primary-foreground rounded-full transition-all hover:opacity-90 font-semibold text-lg shadow-xl"
+                        >
+                            Choose New Lift
+                        </Link>
+                    </div>
                 </div>
             </section>
         </div>
