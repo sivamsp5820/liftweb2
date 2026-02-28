@@ -124,7 +124,7 @@ export function Home() {
       </section>
 
       {/* Categories Section */}
-      <section className="py-20 md:py-32 bg-secondary/30">
+      {/* <section className="py-20 md:py-32 bg-secondary/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl mb-4">Our Product Categories</h2>
@@ -170,7 +170,7 @@ export function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="py-20 md:py-32">

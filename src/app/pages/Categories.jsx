@@ -18,9 +18,17 @@ export function Categories() {
   const [selectedSubcategory, setSelectedSubcategory] = useState(initialSubcategory);
   const [selectedDoorType, setSelectedDoorType] = useState(initialDoorType);
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedGroups, setExpandedGroups] = useState({}); // Track expanded groups
   const { viewMode, setViewMode } = useViewMode();
   const { cart, addToCart, updateQuantity, removeFromCart } = useCart();
   const navigate = useNavigate();
+
+  const toggleGroup = (groupId) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupId]: !prev[groupId]
+    }));
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -122,6 +130,207 @@ export function Categories() {
       i.model.id === product.model.id &&
       JSON.stringify(i.selectedSpecs) === JSON.stringify(defaultSpecs) &&
       (product.isItem ? i.selectedItem?.code === product.item.code : true)
+    );
+  };
+
+  const DEFAULT_VISIBLE_COUNT = 3;
+  const isAllProductsView = selectedCategory === "all" && selectedSubcategory === "all" && selectedDoorType === "all" && !searchQuery;
+
+  const groupedProducts = useMemo(() => {
+    if (!isAllProductsView) return [];
+    return liftModels.map(model => {
+      const prods = displayedProducts.filter(p => p.model?.id === model.id);
+      return { id: model.id, name: model.name, products: prods };
+    }).filter(group => group.products.length > 0);
+  }, [displayedProducts, isAllProductsView]);
+
+  const renderVisualProduct = (prod, index) => {
+    const { model, item, isItem, subcat, category, id } = prod;
+    const cartItem = getCartItem(prod);
+
+    const targetUrl = isItem
+      ? `/product/${model.id}?variant=${item.code}`
+      : `/product/${model.id}`;
+
+    const displayName = isItem ? item.description : model.name;
+    const displayCode = isItem ? item.code : model.code;
+    const displaySubDesc = isItem ? item.subDescription : model.description;
+
+    return (
+      <motion.div
+        key={id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.05 }}
+      >
+        <div
+          onClick={() => navigate(targetUrl)}
+          className="group flex flex-col h-full bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all cursor-pointer"
+        >
+          <div className="relative h-48 overflow-hidden bg-muted">
+            <img
+              src={model.image}
+              alt={displayName}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute top-3 left-3 bg-primary text-primary-foreground px-2 py-1 rounded-md text-xs font-mono">
+              {displayCode}
+            </div>
+          </div>
+          <div className="p-5 flex flex-col flex-1">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              {subcat?.name} {category?.id === 'doors' ? `(${model.specifications?.doorType || 'Doors'})` : ''}
+            </div>
+            <h3 className="text-lg font-medium mb-1 group-hover:text-primary transition-colors line-clamp-2">
+              {displayName}
+            </h3>
+            <p className="text-xs font-mono text-muted-foreground line-clamp-2 mb-4">
+              {displaySubDesc}
+            </p>
+
+            <div className="mt-auto flex justify-between items-center pt-4 border-t border-border">
+              <span className="text-lg font-mono font-bold">${model.price.toLocaleString()}</span>
+
+              <div className="flex items-center gap-2">
+                {cartItem ? (
+                  <div className="flex items-center gap-2 bg-secondary rounded-full p-1" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => {
+                        if (cartItem.quantity > 1) updateQuantity(cartItem.cartId, -1);
+                        else removeFromCart(cartItem.cartId);
+                      }}
+                      className="w-7 h-7 flex items-center justify-center bg-background hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all flex-shrink-0"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-4 text-center text-xs font-medium">
+                      {cartItem.quantity}
+                    </span>
+                    <button
+                      onClick={() => updateQuantity(cartItem.cartId, 1)}
+                      className="w-7 h-7 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all flex-shrink-0"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      addToCart({
+                        model,
+                        subcategory: subcat,
+                        category,
+                        selectedSpecs: calculateDefaultSpecs(model),
+                        selectedItem: isItem ? item : null,
+                        selectedAddons: [],
+                        total: model.price,
+                      });
+                    }}
+                    className="w-9 h-9 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all flex-shrink-0"
+                    title="Add to Cart"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderTechnicalProduct = (prod, index) => {
+    const { model, item, isItem, subcat, category, id } = prod;
+    const cartItem = getCartItem(prod);
+
+    const targetUrl = isItem
+      ? `/product/${model.id}?variant=${item.code}`
+      : `/product/${model.id}`;
+
+    const displayName = isItem ? item.description : model.name;
+    const displayCode = isItem ? item.code : model.code;
+    const displaySubDesc = isItem ? item.subDescription : model.description;
+
+    return (
+      <motion.div
+        key={id}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.05 }}
+        className="h-full"
+      >
+        <div
+          onClick={() => navigate(targetUrl)}
+          className="group flex flex-col h-full p-5 bg-card border border-border rounded-xl hover:border-primary/50 hover:shadow-xl transition-all cursor-pointer"
+        >
+          <div className="flex-1 text-left mb-4">
+            <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-2">
+              {subcat?.name} {category?.id === 'doors' ? `| ${model.specifications?.doorType || 'Doors'} ` : ''}
+            </div>
+            <h3 className="text-xl font-medium group-hover:text-primary transition-colors mb-4 line-clamp-2">
+              {displayName}
+            </h3>
+            <div className="text-xs text-muted-foreground uppercase tracking-widest mb-1 font-semibold">
+              Specifications
+            </div>
+            <div className="text-xs font-mono text-muted-foreground line-clamp-2">
+              ({displayCode} / {displaySubDesc})
+            </div>
+          </div>
+
+          <div className="mt-auto flex items-center gap-4 justify-between w-full border-t border-border pt-4">
+            <div className="text-left flex flex-col">
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Price</span>
+              <span className="text-lg font-mono font-bold">${model.price.toLocaleString()}</span>
+            </div>
+
+            {cartItem ? (
+              <div className="flex items-center gap-2 bg-secondary rounded-full p-1" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={() => {
+                    if (cartItem.quantity > 1) updateQuantity(cartItem.cartId, -1);
+                    else removeFromCart(cartItem.cartId);
+                  }}
+                  className="w-8 h-8 flex items-center justify-center bg-background hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <span className="w-4 text-center text-sm font-medium">
+                  {cartItem.quantity}
+                </span>
+                <button
+                  onClick={() => updateQuantity(cartItem.cartId, 1)}
+                  className="w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all shadow-sm flex-shrink-0"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCart({
+                    model,
+                    subcategory: subcat,
+                    category,
+                    selectedSpecs: calculateDefaultSpecs(model),
+                    selectedItem: isItem ? item : null,
+                    selectedAddons: [],
+                    total: model.price,
+                  });
+                }}
+                className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                title="Add to Cart"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      </motion.div>
     );
   };
 
@@ -245,8 +454,8 @@ export function Categories() {
                   <Link
                     to={customConfigUrl}
                     className={`px-6 py-2.5 font-semibold rounded-lg transition-opacity flex items-center gap-2 shadow-sm ${firstModel
-                        ? "bg-primary text-primary-foreground hover:opacity-90"
-                        : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                      ? "bg-primary text-primary-foreground hover:opacity-90"
+                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
                       }`}
                     onClick={(e) => {
                       if (!firstModel) e.preventDefault();
@@ -262,7 +471,48 @@ export function Categories() {
 
           {/* Product Grid */}
           <AnimatePresence mode="wait">
-            {viewMode === 'visual' ? (
+            {isAllProductsView ? (
+              <motion.div
+                key="grouped"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="space-y-12"
+              >
+                {groupedProducts.map((group) => (
+                  <div key={group.id} className="bg-card border border-border rounded-xl p-6 sm:p-8 shadow-sm">
+                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+                      <h2 className="text-2xl font-semibold tracking-tight">{group.name}</h2>
+                      <span className="px-3 py-1 bg-secondary text-secondary-foreground text-xs font-medium rounded-full">
+                        {group.products.length} {group.products.length === 1 ? 'Product' : 'Products'}
+                      </span>
+                    </div>
+
+                    {viewMode === 'visual' ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                        {(expandedGroups[group.id] ? group.products : group.products.slice(0, DEFAULT_VISIBLE_COUNT)).map((prod, index) => renderVisualProduct(prod, index))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                        {(expandedGroups[group.id] ? group.products : group.products.slice(0, DEFAULT_VISIBLE_COUNT)).map((prod, index) => renderTechnicalProduct(prod, index))}
+                      </div>
+                    )}
+
+                    {group.products.length > DEFAULT_VISIBLE_COUNT && (
+                      <div className="mt-8 flex justify-end">
+                        <button
+                          onClick={() => toggleGroup(group.id)}
+                          className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+                        >
+                          {expandedGroups[group.id] ? "Show Less" : "See More"}
+                          <ArrowRight className={`w-4 h-4 transition-transform ${expandedGroups[group.id] ? '-rotate-90' : 'rotate-90'}`} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </motion.div>
+            ) : viewMode === 'visual' ? (
               <motion.div
                 key="visual"
                 initial={{ opacity: 0 }}
@@ -270,104 +520,7 @@ export function Categories() {
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               >
-                {displayedProducts.map((prod, index) => {
-                  const { model, item, isItem, subcat, category, id } = prod;
-                  const cartItem = getCartItem(prod);
-
-                  const targetUrl = isItem
-                    ? `/product/${model.id}?variant=${item.code}`
-                    : `/product/${model.id}`;
-
-                  const displayName = isItem ? item.description : model.name;
-                  const displayCode = isItem ? item.code : model.code;
-                  const displaySubDesc = isItem ? item.subDescription : model.description;
-
-                  return (
-                    <motion.div
-                      key={id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <div
-                        onClick={() => navigate(targetUrl)}
-                        className="group flex flex-col h-full bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all cursor-pointer"
-                      >
-                        <div className="relative h-48 overflow-hidden bg-muted">
-                          <img
-                            src={model.image}
-                            alt={displayName}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <div className="absolute top-3 left-3 bg-primary text-primary-foreground px-2 py-1 rounded-md text-xs font-mono">
-                            {displayCode}
-                          </div>
-                        </div>
-                        <div className="p-5 flex flex-col flex-1">
-                          <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                            {subcat?.name} {category?.id === 'doors' ? `(${model.specifications?.doorType || 'Doors'})` : ''}
-                          </div>
-                          <h3 className="text-lg font-medium mb-1 group-hover:text-primary transition-colors line-clamp-2">
-                            {displayName}
-                          </h3>
-                          <p className="text-xs font-mono text-muted-foreground line-clamp-2 mb-4">
-                            {displaySubDesc}
-                          </p>
-
-                          <div className="mt-auto flex justify-between items-center pt-4 border-t border-border">
-                            <span className="text-lg font-mono font-bold">${model.price.toLocaleString()}</span>
-
-                            <div className="flex items-center gap-2">
-                              {cartItem ? (
-                                <div className="flex items-center gap-2 bg-secondary rounded-full p-1" onClick={(e) => e.stopPropagation()}>
-                                  <button
-                                    onClick={() => {
-                                      if (cartItem.quantity > 1) updateQuantity(cartItem.cartId, -1);
-                                      else removeFromCart(cartItem.cartId);
-                                    }}
-                                    className="w-7 h-7 flex items-center justify-center bg-background hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all flex-shrink-0"
-                                  >
-                                    <Minus className="w-3 h-3" />
-                                  </button>
-                                  <span className="w-4 text-center text-xs font-medium">
-                                    {cartItem.quantity}
-                                  </span>
-                                  <button
-                                    onClick={() => updateQuantity(cartItem.cartId, 1)}
-                                    className="w-7 h-7 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all flex-shrink-0"
-                                  >
-                                    <Plus className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    addToCart({
-                                      model,
-                                      subcategory: subcat,
-                                      category,
-                                      selectedSpecs: calculateDefaultSpecs(model),
-                                      selectedItem: isItem ? item : null,
-                                      selectedAddons: [],
-                                      total: model.price,
-                                    });
-                                  }}
-                                  className="w-9 h-9 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all flex-shrink-0"
-                                  title="Add to Cart"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </button>
-                              )}
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                {displayedProducts.map((prod, index) => renderVisualProduct(prod, index))}
               </motion.div>
             ) : (
               <motion.div
@@ -375,99 +528,9 @@ export function Categories() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="space-y-4"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"
               >
-                {displayedProducts.map((prod, index) => {
-                  const { model, item, isItem, subcat, category, id } = prod;
-                  const cartItem = getCartItem(prod);
-
-                  const targetUrl = isItem
-                    ? `/product/${model.id}?variant=${item.code}`
-                    : `/product/${model.id}`;
-
-                  const displayName = isItem ? item.description : model.name;
-                  const displayCode = isItem ? item.code : model.code;
-                  const displaySubDesc = isItem ? item.subDescription : model.description;
-
-                  return (
-                    <motion.div
-                      key={id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <div
-                        onClick={() => navigate(targetUrl)}
-                        className="group flex flex-col md:flex-row md:items-center p-6 bg-card border border-border rounded-xl hover:border-primary/50 hover:shadow-xl transition-all cursor-pointer"
-                      >
-                        <div className="flex-1 text-left">
-                          <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">
-                            {subcat?.name} {category?.id === 'doors' ? `| ${model.specifications?.doorType || 'Doors'} ` : ''}
-                          </div>
-                          <h3 className="text-xl md:text-2xl font-medium group-hover:text-primary transition-colors mb-4 line-clamp-2">
-                            {displayName}
-                          </h3>
-                          <div className="text-xs text-muted-foreground uppercase tracking-widest mb-1 font-semibold">
-                            Specifications
-                          </div>
-                          <div className="text-sm font-mono text-muted-foreground">
-                            ({displayCode} / {displaySubDesc})
-                          </div>
-                        </div>
-
-                        <div className="mt-6 md:mt-0 md:ml-6 flex items-center gap-6 justify-between w-full md:w-auto border-t md:border-t-0 border-border pt-4 md:pt-0">
-                          <div className="text-right flex flex-col items-end">
-                            <span className="text-sm text-muted-foreground uppercase tracking-wider mb-1">Price</span>
-                            <span className="text-xl font-mono font-bold">${model.price.toLocaleString()}</span>
-                          </div>
-
-                          {cartItem ? (
-                            <div className="flex items-center gap-3 bg-secondary rounded-full p-1" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                onClick={() => {
-                                  if (cartItem.quantity > 1) updateQuantity(cartItem.cartId, -1);
-                                  else removeFromCart(cartItem.cartId);
-                                }}
-                                className="w-10 h-10 flex items-center justify-center bg-background hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all shadow-sm flex-shrink-0"
-                              >
-                                <Minus className="w-4 h-4" />
-                              </button>
-                              <span className="w-4 text-center font-medium">
-                                {cartItem.quantity}
-                              </span>
-                              <button
-                                onClick={() => updateQuantity(cartItem.cartId, 1)}
-                                className="w-10 h-10 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all shadow-sm flex-shrink-0"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                addToCart({
-                                  model,
-                                  subcategory: subcat,
-                                  category,
-                                  selectedSpecs: calculateDefaultSpecs(model),
-                                  selectedItem: isItem ? item : null,
-                                  selectedAddons: [],
-                                  total: model.price,
-                                });
-                              }}
-                              className="w-12 h-12 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
-                              title="Add to Cart"
-                            >
-                              <Plus className="w-5 h-5" />
-                            </button>
-                          )}
-                        </div>
-
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                {displayedProducts.map((prod, index) => renderTechnicalProduct(prod, index))}
               </motion.div>
             )}
           </AnimatePresence>
