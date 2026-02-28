@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { Building2, ShoppingCart, Menu, X } from "lucide-react";
+import { Building2, ShoppingCart, Menu, X, User } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 
@@ -57,6 +57,13 @@ export function Layout() {
                   </span>
                 )}
               </Link>
+              <Link
+                to="/auth"
+                className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+              >
+                <User className="w-4 h-4" />
+                <span className="text-sm font-semibold">Sign In</span>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -95,6 +102,14 @@ export function Layout() {
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span className="text-sm font-semibold">Cart ({cartCount})</span>
+                </Link>
+                <Link
+                  to="/auth"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-4 py-3 bg-secondary text-secondary-foreground rounded-lg justify-center relative mt-2"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="text-sm font-semibold">Sign In / Sign Up</span>
                 </Link>
               </div>
             </div>
