@@ -513,25 +513,53 @@ export function Categories() {
                 ))}
               </motion.div>
             ) : viewMode === 'visual' ? (
-              <motion.div
-                key="visual"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-              >
-                {displayedProducts.map((prod, index) => renderVisualProduct(prod, index))}
-              </motion.div>
+              <div className="space-y-8">
+                <motion.div
+                  key="visual"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                >
+                  {(expandedGroups['single-view'] ? displayedProducts : displayedProducts.slice(0, DEFAULT_VISIBLE_COUNT)).map((prod, index) => renderVisualProduct(prod, index))}
+                </motion.div>
+
+                {displayedProducts.length > DEFAULT_VISIBLE_COUNT && (
+                  <div className="flex justify-end mt-8">
+                    <button
+                      onClick={() => toggleGroup('single-view')}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+                    >
+                      {expandedGroups['single-view'] ? "Show Less" : "See More"}
+                      <ArrowRight className={`w-4 h-4 transition-transform ${expandedGroups['single-view'] ? '-rotate-90' : 'rotate-90'}`} />
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <motion.div
-                key="technical"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"
-              >
-                {displayedProducts.map((prod, index) => renderTechnicalProduct(prod, index))}
-              </motion.div>
+              <div className="space-y-8">
+                <motion.div
+                  key="technical"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"
+                >
+                  {(expandedGroups['single-view'] ? displayedProducts : displayedProducts.slice(0, DEFAULT_VISIBLE_COUNT)).map((prod, index) => renderTechnicalProduct(prod, index))}
+                </motion.div>
+
+                {displayedProducts.length > DEFAULT_VISIBLE_COUNT && (
+                  <div className="flex justify-end mt-8">
+                    <button
+                      onClick={() => toggleGroup('single-view')}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+                    >
+                      {expandedGroups['single-view'] ? "Show Less" : "See More"}
+                      <ArrowRight className={`w-4 h-4 transition-transform ${expandedGroups['single-view'] ? '-rotate-90' : 'rotate-90'}`} />
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </AnimatePresence>
 
