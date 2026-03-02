@@ -330,20 +330,11 @@ export function ProductDetail() {
                 )}
 
                 <div className="bg-card border border-border rounded-lg p-4 mt-2">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="mb-3">
                     <h2 className="text-lg flex items-center gap-2">
                       <Package className="w-4 h-4" />
                       Customize Specifications
                     </h2>
-
-                    {/* Mobile Settings Icon */}
-                    <button
-                      onClick={() => setIsMobileSummaryOpen(true)}
-                      className="lg:hidden p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-                      aria-label="View Order Summary"
-                    >
-                      <Settings className="w-5 h-5" />
-                    </button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                     {Object.entries(model.specifications).map(([key, value]) => {
@@ -554,6 +545,29 @@ export function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Floating Draggable Mobile Settings Icon */}
+      {!isMobileSummaryOpen && (
+        <motion.div
+          drag
+          dragConstraints={{ top: 100, bottom: window.innerHeight - 200, left: 20, right: window.innerWidth - 60 }}
+          dragElastic={0.1}
+          dragMomentum={false}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-40 lg:hidden cursor-grab active:cursor-grabbing"
+          style={{ touchAction: "none" }}
+        >
+          <button
+            onClick={() => setIsMobileSummaryOpen(true)}
+            className="w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-2xl shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+            aria-label="View Order Summary"
+          >
+            <Settings className="w-6 h-6 animate-[spin_4s_linear_infinite]" />
+            <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-background rounded-full" />
+          </button>
+        </motion.div>
+      )}
 
       {/* Mobile Settings Popup/Overlay */}
       <AnimatePresence>
