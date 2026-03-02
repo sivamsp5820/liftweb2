@@ -53,7 +53,7 @@ export function Variants() {
     return (
         <div className="w-full">
             {/* Breadcrumb */}
-            <div className="bg-secondary/30 py-4 border-b border-border">
+            <div className="bg-secondary/30 py-2 border-b border-border">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Link to="/categories" className="hover:text-foreground">
@@ -80,41 +80,37 @@ export function Variants() {
             </div>
 
             {/* Header */}
-            <section className="py-16 md:py-24 border-b border-border bg-secondary/10">
+            <section className="py-8 border-b border-border bg-secondary/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="flex flex-col md:flex-row md:items-end justify-between gap-8 max-w-5xl mx-auto text-center md:text-left"
+                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-5xl mx-auto text-center md:text-left"
                     >
                         <div className="flex-1">
-                            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground px-4 py-1 border border-border rounded-full mb-6 inline-block">
-                                Variant Selection
-                            </span>
-                            <h1 className="text-4xl md:text-6xl mb-6 tracking-tight">
+                            <h1 className="text-3xl md:text-4xl mb-2 tracking-tight">
                                 Select {model.name} Variant
                             </h1>
-                            <p className="text-lg text-muted-foreground">
+                            <p className="text-base text-muted-foreground">
                                 Choose the specific {model.name} configuration based on your requirements.
                             </p>
                         </div>
-
+                        <div>
+                            <Link
+                                to={`/product/${model.id}`}
+                                className="inline-flex items-center justify-center gap-2 py-2 px-4 bg-primary text-primary-foreground rounded-lg transition-all font-semibold shadow hover:opacity-90 whitespace-nowrap text-sm"
+                            >
+                                <span>Choose New Combo</span>
+                            </Link>
+                        </div>
                     </motion.div>
                 </div>
             </section>
 
             {/* Content */}
-            <section className="py-20">
+            <section className="py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-end mb-8">
-                        <Link
-                            to={`/product/${model.id}`}
-                            className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-primary text-primary-foreground rounded-xl transition-all font-semibold shadow-lg hover:opacity-90 whitespace-nowrap"
-                        >
-                            <span>Choose New Combo</span>
-                        </Link>
-                    </div>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={viewMode}
@@ -137,7 +133,7 @@ export function Variants() {
                                         whileHover="hover"
                                         transition={{ delay: index * 0.05 }}
                                     >
-                                        <div className="group flex flex-col md:flex-row md:items-center gap-4">
+                                        <div className="group flex flex-col md:flex-row md:items-center gap-3">
                                             <div
                                                 onClick={() => {
                                                     if (!cartItem) {
@@ -154,20 +150,14 @@ export function Variants() {
                                                         updateQuantity(cartItem.cartId, 1);
                                                     }
                                                 }}
-                                                className="flex-1 flex items-center justify-between gap-6 bg-card border border-border rounded-2xl p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl cursor-pointer"
+                                                className="flex-1 flex items-center justify-between gap-4 bg-card border border-border rounded-xl p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-md cursor-pointer"
                                             >
                                                 <div className="flex-1">
-                                                    <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">
-                                                        {subcategory.name}
-                                                    </div>
-                                                    <h3 className="text-xl md:text-2xl font-medium group-hover:text-primary transition-colors mb-4 line-clamp-2">
+                                                    <h3 className="text-lg font-medium group-hover:text-primary transition-colors mb-1 line-clamp-2">
                                                         {item.description}
                                                     </h3>
-                                                    <div className="text-xs text-muted-foreground uppercase tracking-widest mb-1 font-semibold">
-                                                        Specifications
-                                                    </div>
                                                     <div className="text-sm font-mono text-muted-foreground">
-                                                        ({item.code} / {item.subDescription})
+                                                        {item.code} • {item.subDescription}
                                                     </div>
                                                 </div>
 
@@ -223,10 +213,10 @@ export function Variants() {
                         </motion.div>
                     </AnimatePresence>
 
-                    <div className="mt-12 flex justify-center">
+                    <div className="mt-8 flex justify-center">
                         <Link
                             to="/categories"
-                            className="inline-flex items-center justify-center gap-2 py-4 px-8 bg-primary text-primary-foreground rounded-full transition-all hover:opacity-90 font-semibold text-lg shadow-xl"
+                            className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-primary text-primary-foreground rounded-full transition-all hover:opacity-90 font-semibold shadow-md"
                         >
                             Choose New Lift
                         </Link>

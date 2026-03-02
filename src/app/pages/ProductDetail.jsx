@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate, useLocation } from "react-router";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   ArrowLeft,
   Download,
@@ -18,9 +18,12 @@ export function ProductDetail() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSpecs, setSelectedSpecs] = useState({});
   const [selectedItem, setSelectedItem] = useState(null);
+  const [highlightedSpec, setHighlightedSpec] = useState(null);
+  const specsContainerRef = useRef(null);
+  const specRefs = useRef({});
+  const highlightTimeoutRef = useRef(null);
 
   const { addToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
@@ -54,7 +57,7 @@ export function ProductDetail() {
 
   if (!model || !subcategory || !category) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+      <div className="max-w-[1536px] mx-auto px-4 py-20 text-center">
         <h1 className="text-2xl mb-4">Product not found</h1>
         <Link to="/categories" className="text-primary">
           Back to categories
@@ -62,6 +65,25 @@ export function ProductDetail() {
       </div>
     );
   }
+
+  const handleSpecSelect = (key, option) => {
+    setSelectedSpecs(prev => ({ ...prev, [key]: option }));
+    setHighlightedSpec(key);
+
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+    highlightTimeoutRef.current = setTimeout(() => {
+      setHighlightedSpec(null);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (highlightedSpec && specRefs.current[highlightedSpec] && specsContainerRef.current) {
+      // scroll to it
+      specRefs.current[highlightedSpec].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [highlightedSpec, selectedSpecs]);
 
   const handleAddToCart = () => {
     addToCart({
@@ -100,60 +122,33 @@ export function ProductDetail() {
 
   // Dynamic Quick Specs mapping
   const getQuickSpecs = () => {
-    if (category.id !== 'doors') {
-      return [
-        { label: "Load Capacity", value: `${model.capacity} kg` },
-        { label: "Passengers", value: model.passengers },
-        { label: "Speed", value: model.speed },
-        { label: "Base Price", value: `$${model.price.toLocaleString()}` }
-      ];
-    }
-
-    const doorSpecs = model.specifications;
     const specs = [];
 
-    // Map common door specs to the properties grid
-    if (selectedSpecs.doorOpenType) {
-      specs.push({
-        label: "Open Type",
-        value: selectedSpecs.doorOpenType
-      });
-    }
+    // Base attributes
+    specs.push({ label: "Category", value: category.name });
+    specs.push({ label: "Series", value: subcategory.name });
+    if (model.capacity) specs.push({ label: "Load Capacity", value: `${model.capacity} kg` });
+    if (model.passengers) specs.push({ label: "Passengers", value: model.passengers });
+    if (model.speed) specs.push({ label: "Speed", value: model.speed });
 
-    if (selectedSpecs.doorOpeningWidth) {
-      specs.push({
-        label: "Opening Width",
-        value: `${selectedSpecs.doorOpeningWidth} mm`
-      });
-    }
+    // Map all selected specs to the properties grid
+    Object.entries(selectedSpecs).forEach(([key, value]) => {
+      let displayValue = Array.isArray(value) ? value.join(", ") : value;
+      // Append 'mm' intelligently
+      if ((key.toLowerCase().includes('width') || key.toLowerCase().includes('height')) && !String(displayValue).includes('mm')) {
+        displayValue = `${displayValue} mm`;
+      }
 
-    if (selectedSpecs.doorHeight) {
-      specs.push({
-        label: "Door Height",
-        value: `${selectedSpecs.doorHeight} mm`
-      });
-    }
+      // Title case labels
+      let label = key.replace(/([A-Z])/g, " $1").trim();
+      label = label.charAt(0).toUpperCase() + label.slice(1);
 
-    if (selectedSpecs.grade) {
       specs.push({
-        label: "Grade",
-        value: selectedSpecs.grade
+        label: label,
+        value: displayValue,
+        originalKey: key
       });
-    }
-
-    if (selectedSpecs.safetyNorms) {
-      specs.push({
-        label: "Safety Norms",
-        value: selectedSpecs.safetyNorms
-      });
-    }
-
-    if (selectedSpecs.fireCertification) {
-      specs.push({
-        label: "Fire Rating",
-        value: selectedSpecs.fireCertification
-      });
-    }
+    });
 
     // Always include Base Price
     specs.push({
@@ -169,8 +164,8 @@ export function ProductDetail() {
   return (
     <div className="w-full pb-20">
       {/* Breadcrumb */}
-      <div className="bg-secondary/30 py-4 border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-secondary/30 py-2 border-b border-border">
+        <div className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link to="/categories" className="hover:text-foreground">
               Categories
@@ -198,85 +193,37 @@ export function ProductDetail() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-7 space-y-6">
             {/* Back Button */}
-            <Link
-              to={`/category/${category.id}`}
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to {category.name}
-            </Link>
-
-
-            {/* Gallery */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className="bg-card border border-border rounded-lg overflow-hidden">
-                <div className="relative h-96 bg-muted">
-                  <img
-                    src={model.gallery[selectedImage] || model.image}
-                    alt={model.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-mono">
-                    {model.code}
-                  </div>
-                  <div className="absolute top-4 right-4 bg-background/90 backdrop-blur px-3 py-1 rounded text-sm">
-                    {subcategory.name}
-                  </div>
-                </div>
-                {model.gallery && model.gallery.length > 0 && (
-                  <div className="p-4 grid grid-cols-4 gap-2">
-                    {model.gallery.map((img, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setSelectedImage(idx)}
-                        className={`relative h-20 rounded overflow-hidden border-2 transition-all ${selectedImage === idx
-                          ? "border-primary"
-                          : "border-transparent hover:border-border"
-                          }`}
-                      >
-                        <img
-                          src={img}
-                          alt={`View ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
+            <div className="flex items-center justify-between">
+              <Link
+                to={`/category/${category.id}`}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to {category.name}
+              </Link>
+              <div className="flex gap-2">
+                <span className="text-xs uppercase tracking-[0.3em] font-mono bg-primary text-primary-foreground px-2 py-1 rounded">
+                  {model.code}
+                </span>
+                <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground px-2 py-1 border border-border rounded">
+                  {subcategory.name}
+                </span>
               </div>
-            </motion.div>
+            </div>
 
             {/* Product Info */}
             <div>
-              <div className="mb-4">
-                <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground px-3 py-1 border border-border rounded-full">
-                  {subcategory.code}
-                </span>
-              </div>
-              <h1 className="text-4xl mb-4">{model.name}</h1>
-              <p className="text-lg text-muted-foreground mb-6">
+              <h1 className="text-3xl mb-2">{model.name}</h1>
+              <p className="text-base text-muted-foreground mb-4">
                 {model.description}
               </p>
 
-              {/* Quick Specs */}
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
-                {quickSpecs.map((spec, idx) => (
-                  <div key={idx} className="p-4 bg-secondary/30 rounded-lg">
-                    <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                      {spec.label}
-                    </div>
-                    <div className="text-xl font-mono leading-tight break-words">{spec.value}</div>
-                  </div>
-                ))}
-              </div>
+
 
               <button
                 onClick={handleDownloadSpec}
@@ -289,15 +236,15 @@ export function ProductDetail() {
 
 
             {variantCode ? (
-              <div className="bg-card border border-border rounded-lg p-6 mt-8">
-                <h2 className="text-2xl mb-6 flex items-center gap-2">
-                  <List className="w-6 h-6" />
+              <div className="bg-card border border-border rounded-lg p-4 mt-2">
+                <h2 className="text-lg mb-3 flex items-center gap-2">
+                  <List className="w-4 h-4" />
                   Technical Specifications
                 </h2>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {Object.entries(model.specifications).map(([key, value]) => (
-                    <div key={key} className="p-4 bg-secondary/30 rounded-lg">
-                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                    <div key={key} className="p-3 bg-secondary/30 rounded-lg">
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
                         {key.replace(/([A-Z])/g, " $1").trim()}
                       </div>
                       <div className="text-lg font-mono leading-tight break-words">
@@ -309,37 +256,37 @@ export function ProductDetail() {
                 </div>
               </div>
             ) : (
-              <div className="bg-card border border-border rounded-lg p-6 mt-8">
-                <h2 className="text-2xl mb-6 flex items-center gap-2">
-                  <Package className="w-6 h-6" />
+              <div className="bg-card border border-border rounded-lg p-4 mt-2">
+                <h2 className="text-lg mb-3 flex items-center gap-2">
+                  <Package className="w-4 h-4" />
                   Customize Specifications
                 </h2>
-                <div className="grid grid-cols-1 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   {Object.entries(model.specifications).map(([key, value]) => {
                     if (!Array.isArray(value) || value.length <= 1) {
                       return (
-                        <div key={key} className="pb-4 border-b border-border">
-                          <div className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
+                        <div key={key} className="pb-2 flex flex-col justify-end">
+                          <div className="text-[11px] text-muted-foreground uppercase tracking-wider mb-0.5">
                             {key.replace(/([A-Z])/g, " $1").trim()}
                           </div>
-                          <div className="font-mono text-lg">{Array.isArray(value) ? value[0] : value}</div>
+                          <div className="font-mono text-[15px] font-medium text-foreground">{Array.isArray(value) ? value[0] : value}</div>
                         </div>
                       );
                     }
 
                     return (
-                      <div key={key} className="space-y-4">
-                        <div className="text-sm text-muted-foreground uppercase tracking-wide">
+                      <div key={key} className="space-y-2 pb-3 border-b border-border/20 last:border-0">
+                        <div className="text-[11px] text-muted-foreground uppercase tracking-wider">
                           {key.replace(/([A-Z])/g, " $1").trim()}
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {value.map((option) => (
                             <button
                               key={option}
-                              onClick={() => setSelectedSpecs(prev => ({ ...prev, [key]: option }))}
-                              className={`px-4 py-2 rounded-md border transition-all text-sm font-medium ${selectedSpecs[key] === option
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border hover:border-muted-foreground text-muted-foreground"
+                              onClick={() => handleSpecSelect(key, option)}
+                              className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${selectedSpecs[key] === option
+                                ? "border-primary bg-primary/10 text-primary shadow-sm"
+                                : "border-border/50 hover:border-primary/40 text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
                                 }`}
                             >
                               {option}
@@ -356,31 +303,71 @@ export function ProductDetail() {
           </div>
 
           {/* Price Summary Sidebar - Sticky */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-5">
             <div className="sticky top-24">
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h2 className="text-xl mb-6 flex items-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  Price Summary
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="bg-card/80 backdrop-blur-md border border-border/50 shadow-2xl rounded-2xl p-6 relative overflow-hidden"
+              >
+                {/* Decorative background glow */}
+                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
+
+                <h2 className="text-xl mb-4 flex items-center gap-2 font-medium">
+                  <Shield className="w-5 h-5 text-primary" />
+                  Summary & Price
                 </h2>
 
-                <div className="space-y-4 mb-6">
+                <div className="mb-4 pb-4 border-b border-border">
+                  <div className="font-semibold text-xl mb-1 text-primary">{selectedItem ? selectedItem.description : model.name}</div>
+                  <div className="text-sm font-mono text-muted-foreground mb-4">{selectedItem ? selectedItem.code : subcategory.name}</div>
+
+                  <div
+                    ref={specsContainerRef}
+                    className="flex flex-wrap gap-2 max-h-[25vh] overflow-y-auto pr-2 pb-2 custom-scrollbar scroll-smooth"
+                  >
+                    {quickSpecs.filter(s => s.label !== "Base Price").map((spec, idx) => {
+                      const isHighlighted = highlightedSpec === spec.originalKey;
+                      return (
+                        <div
+                          key={idx}
+                          ref={el => { if (spec.originalKey) specRefs.current[spec.originalKey] = el; }}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all duration-300 ${isHighlighted
+                              ? "bg-primary/20 border-primary ring-1 ring-primary ring-offset-1 ring-offset-background/50 scale-110 z-10"
+                              : "bg-secondary/50 border-border/50"
+                            }`}
+                        >
+                          <span className={`text-[11px] uppercase tracking-wider transition-colors ${isHighlighted ? "text-primary font-bold" : "text-muted-foreground"}`}>{spec.label}:</span>
+                          <span className={`text-xs font-mono font-medium transition-colors ${isHighlighted ? "text-primary" : ""}`}>{spec.value}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6 relative z-10">
                   {/* Base Price */}
-                  <div className="flex justify-between pb-4 border-b border-border">
-                    <div>
-                      <div className="font-medium">{selectedItem ? selectedItem.description : model.name}</div>
-                      <div className="text-sm text-muted-foreground">{selectedItem ? selectedItem.code : 'Base unit'}</div>
-                    </div>
-                    <div className="font-mono">${model.price.toLocaleString()}</div>
+                  <div className="flex justify-between pb-3">
+                    <div className="text-sm text-muted-foreground font-medium">Base Price</div>
+                    <div className="font-mono text-muted-foreground">${model.price.toLocaleString()}</div>
                   </div>
 
-                  <div className="flex justify-between pt-4 border-t-2 border-primary">
+                  <div className="flex justify-between pt-4 border-t border-border/50 relative">
+                    {/* Decorative glow on total */}
+                    <div className="absolute left-0 bottom-0 w-full h-8 bg-primary/5 blur-xl pointer-events-none" />
                     <div>
-                      <div className="text-sm text-muted-foreground uppercase tracking-wide">
+                      <div className="text-sm text-foreground uppercase tracking-widest font-bold">
                         Total Price
                       </div>
                     </div>
-                    <div className="text-2xl font-mono">${model.price.toLocaleString()}</div>
+                    <motion.div
+                      key={model.price}
+                      initial={{ scale: 1.1, color: "var(--primary)" }}
+                      animate={{ scale: 1, color: "var(--foreground)" }}
+                      className="text-3xl font-mono font-bold"
+                    >
+                      ${model.price.toLocaleString()}
+                    </motion.div>
                   </div>
                 </div>
 
@@ -390,7 +377,7 @@ export function ProductDetail() {
                     <button
                       onClick={handleAddToCart}
                       disabled={isAdded}
-                      className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-lg transition-all ${isAdded
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
                         ? "bg-green-600 text-white"
                         : "bg-secondary hover:bg-secondary/80 text-foreground"
                         }`}
@@ -422,18 +409,17 @@ export function ProductDetail() {
                     </button>
                     <button
                       onClick={handleBuyNow}
-                      className="flex-1 px-6 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                      className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm"
                     >
                       Buy Now
                     </button>
                   </div>
-                  <button className="w-full px-6 py-3 border border-border rounded-lg hover:bg-secondary transition-colors text-sm">
+                  <button className="w-full px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors text-sm">
                     Request Quote
                   </button>
                 </div>
 
-                {/* Info */}
-                <div className="mt-6 pt-6 border-t border-border space-y-2 text-sm text-muted-foreground">
+                <div className="mt-4 pt-4 border-t border-border space-y-1.5 text-[13px] text-muted-foreground">
                   <div className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
                     <span>Professional installation included</span>
@@ -447,11 +433,11 @@ export function ProductDetail() {
                     <span>24/7 technical support</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
