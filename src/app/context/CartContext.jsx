@@ -30,10 +30,10 @@ export function CartProvider({ children }) {
 
             if (existing) {
                 return prev.map((i) =>
-                    i === existing ? { ...i, quantity: i.quantity + 1 } : i
+                    i === existing ? { ...i, quantity: i.quantity + (item.quantity || 1) } : i
                 );
             }
-            return [...prev, { ...item, cartId: Date.now(), quantity: 1 }];
+            return [...prev, { ...item, cartId: Date.now(), quantity: item.quantity || 1 }];
         });
     };
 

@@ -14,9 +14,9 @@ export function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center max-w-4xl mx-auto"
+            className="text-center max-w-4xl mx-auto relative z-20 pointer-events-none"
           >
-            <div className="inline-block mb-6">
+            <div className="inline-block mb-6 pointer-events-auto">
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground px-4 py-1 border border-border rounded-full">
                 Since 1985
               </span>
@@ -30,7 +30,7 @@ export function Home() {
               Premium lift solutions for residential, commercial, industrial, and medical applications.
               Built with precision, designed for reliability.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pointer-events-auto">
               <Link
                 to="/categories"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
@@ -43,6 +43,52 @@ export function Home() {
               </button>
             </div>
           </motion.div>
+
+          <div className="absolute inset-0 top-1/2 -mt-16 w-full max-w-xs mx-auto flex justify-center items-center opacity-30 md:opacity-20 z-0 pointer-events-none mix-blend-multiply dark:mix-blend-screen overflow-visible px-4">
+            {/* Elevator Shaft */}
+            <div className="absolute h-full md:h-[150%] top-0 md:-top-1/4 border-x border-border/50 w-32 md:w-48 mx-auto overflow-visible flex justify-center">
+              {/* Central Rail */}
+              <div className="absolute inset-y-0 w-[1px] md:w-[2px] bg-border/40" />
+
+              {/* Floor Indicators */}
+              <div className="absolute top-[30%] w-full flex justify-between px-2 md:px-4">
+                <div className="w-2 md:w-3 h-1 bg-border/50" />
+                <div className="w-2 md:w-3 h-1 bg-border/50" />
+              </div>
+              <div className="absolute top-[70%] w-full flex justify-between px-2 md:px-4">
+                <div className="w-2 md:w-3 h-1 bg-border/50" />
+                <div className="w-2 md:w-3 h-1 bg-border/50" />
+              </div>
+
+              {/* Moving Elevator Cabin */}
+              <motion.div
+                initial={{ y: "150%" }}
+                animate={{ y: ["150%", "-50%", "150%"] }}
+                transition={{
+                  duration: 12,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 0.5
+                }}
+                className="w-24 md:w-36 h-28 md:h-40 bg-card border border-primary/50 shadow-lg shadow-primary/20 flex flex-col items-center justify-between p-2 relative z-10"
+              >
+                {/* Ceiling details */}
+                <div className="w-full flex justify-between px-1 md:px-2">
+                  <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-primary/40 animate-pulse" />
+                  <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-primary/40 animate-pulse" />
+                </div>
+
+                {/* Cabin Doors */}
+                <div className="w-full flex-1 flex my-2 md:my-3 border border-border/50 overflow-hidden bg-background/50 relative">
+                  <div className="h-full w-[49%] bg-secondary border-r border-border/50 absolute left-0" />
+                  <div className="h-full w-[49%] bg-secondary border-l border-border/50 absolute right-0" />
+                </div>
+
+                {/* Floor details */}
+                <div className="w-full h-1 bg-primary/30 rounded-full" />
+              </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 

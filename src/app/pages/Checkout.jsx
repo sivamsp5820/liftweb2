@@ -48,6 +48,20 @@ export function Checkout() {
 
   const formData = watch();
 
+  const scrollToSection = (stepNumber) => {
+    const element = document.getElementById(`step-${stepNumber}`);
+    if (element) {
+      const offset = 100;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
   const isStepCompleted = (stepNumber) => {
     if (stepNumber === 1) return cart.length > 0;
     if (stepNumber === 2) {
@@ -114,7 +128,7 @@ export function Checkout() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Mobile Progress Stepper */}
           <div className="lg:hidden mb-12">
             <div className="flex items-center justify-center gap-2">
@@ -122,14 +136,16 @@ export function Checkout() {
                 const completed = isStepCompleted(step.number);
                 return (
                   <div key={step.number} className="flex items-center">
-                    <div
-                      className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-500 ${completed
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection(step.number)}
+                      className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-500 cursor-pointer hover:opacity-80 ${completed
                         ? "bg-primary text-primary-foreground shadow-md"
                         : "bg-card border border-border text-muted-foreground opacity-50"
                         }`}
                     >
                       <step.icon className="w-4 h-4" />
-                    </div>
+                    </button>
                     {idx < steps.length - 1 && (
                       <div
                         className={`w-4 h-0.5 mx-1 transition-colors duration-500 ${isStepCompleted(step.number + 1) ? "bg-primary" : "bg-border"
@@ -143,7 +159,7 @@ export function Checkout() {
           </div>
 
           {/* Vertical Progress Side-rail (Desktop) */}
-          <div className="lg:col-span-1 hidden lg:block sticky top-24">
+          <div className="lg:col-span-2 hidden lg:block sticky top-24">
             <div className="relative">
               {/* Vertical Connector Line Base */}
               <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-border/50" />
@@ -154,7 +170,12 @@ export function Checkout() {
                   const isNextCompleted = idx < steps.length - 1 && isStepCompleted(steps[idx + 1].number);
 
                   return (
-                    <div key={step.number} className="relative flex items-center gap-6 group">
+                    <button
+                      key={step.number}
+                      type="button"
+                      onClick={() => scrollToSection(step.number)}
+                      className="relative flex items-center gap-6 group text-left w-full cursor-pointer hover:opacity-80 transition-opacity"
+                    >
                       {/* Active Connector Segment */}
                       {idx < steps.length - 1 && isNextCompleted && (
                         <div className="absolute left-[23px] top-12 h-16 w-0.5 bg-primary z-10 transition-all duration-700" />
@@ -184,7 +205,7 @@ export function Checkout() {
                           {step.title}
                         </span>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -192,10 +213,10 @@ export function Checkout() {
           </div>
 
           {/* Main Form */}
-          <div className="lg:col-span-2 space-y-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="lg:col-span-6 space-y-6">
+            <form id="checkout-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Configuration Summary - Now Multi-item */}
-              <div className="bg-card border border-border rounded-lg p-6">
+              <div id="step-1" className="bg-card border border-border rounded-lg p-6">
                 <h2 className="text-2xl mb-6 flex items-center gap-2">
                   <Package className="w-6 h-6" />
                   Order Review
@@ -291,7 +312,7 @@ export function Checkout() {
               </div>
 
               {/* Step 2: Customer Details */}
-              <div className="bg-card border border-border rounded-lg p-6">
+              <div id="step-2" className="bg-card border border-border rounded-lg p-6">
                 <h2 className="text-2xl mb-6 flex items-center gap-2">
                   <User className="w-6 h-6" />
                   Customer Details
@@ -398,7 +419,7 @@ export function Checkout() {
               </div>
 
               {/* Step 3: Installation Address */}
-              <div className="bg-card border border-border rounded-lg p-6">
+              <div id="step-3" className="bg-card border border-border rounded-lg p-6">
                 <h2 className="text-2xl mb-6 flex items-center gap-2">
                   <MapPin className="w-6 h-6" />
                   Installation Address
@@ -510,7 +531,7 @@ export function Checkout() {
               </div>
 
               {/* Step 4: Quote/Payment */}
-              <div className="bg-card border border-border rounded-lg p-6">
+              <div id="step-4" className="bg-card border border-border rounded-lg p-6">
                 <h2 className="text-2xl mb-6 flex items-center gap-2">
                   <CreditCard className="w-6 h-6" />
                   Quote or Payment
@@ -571,27 +592,11 @@ export function Checkout() {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="px-8 py-4 border border-border rounded-lg hover:bg-secondary transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-8 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  {formData.paymentMethod === "quote" ? "Submit Quote Request" : "Continue to Payment"}
-                </button>
-              </div>
             </form>
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-4">
             <div className="sticky top-24 bg-card border border-border rounded-lg p-6">
               <h3 className="text-xl mb-6">Order Summary</h3>
 
@@ -624,13 +629,30 @@ export function Checkout() {
                   </div>
                 ))}
 
-                <div className="flex justify-between pt-4 border-t-2 border-primary">
+                <div className="flex justify-between pt-4 border-t-2 border-primary mb-6">
                   <div>
                     <div className="text-sm font-bold uppercase tracking-wider">
                       Total Amount
                     </div>
                   </div>
                   <div className="text-2xl font-mono font-bold">${cartTotal.toLocaleString()}</div>
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    type="submit"
+                    form="checkout-form"
+                    className="w-full px-6 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold shadow-xl shadow-primary/20"
+                  >
+                    {formData.paymentMethod === "quote" ? "Submit Quote Request" : "Continue to Payment"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="w-full px-6 py-4 border border-border bg-background rounded-lg hover:bg-secondary transition-colors font-medium"
+                  >
+                    Back
+                  </button>
                 </div>
               </div>
             </div>

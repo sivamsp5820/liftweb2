@@ -8,11 +8,13 @@ import {
   Package,
   ChevronRight,
   List,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { liftModels, addons, liftCategories, liftSubcategories } from "../data/lifts";
 import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "../context/CartContext";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Settings, X } from "lucide-react";
 
 export function ProductDetail() {
   const { productId } = useParams();
@@ -21,6 +23,7 @@ export function ProductDetail() {
   const [selectedSpecs, setSelectedSpecs] = useState({});
   const [selectedItem, setSelectedItem] = useState(null);
   const [highlightedSpec, setHighlightedSpec] = useState(null);
+  const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false);
   const specsContainerRef = useRef(null);
   const specRefs = useRef({});
   const highlightTimeoutRef = useRef(null);
@@ -29,6 +32,15 @@ export function ProductDetail() {
   const [isAdded, setIsAdded] = useState(false);
   const queryParams = new URLSearchParams(location.search);
   const variantCode = queryParams.get("variant");
+
+  const [isConfirmed, setIsConfirmed] = useState(!!variantCode);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    setIsConfirmed(!!variantCode);
+    setQuantity(1);
+    setIsAdded(false);
+  }, [variantCode]);
 
   const model = liftModels.find((m) => m.id === productId);
 
@@ -94,6 +106,7 @@ export function ProductDetail() {
       selectedItem,
       selectedAddons: [],
       total: model.price,
+      quantity,
     });
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
@@ -108,6 +121,7 @@ export function ProductDetail() {
       selectedItem,
       selectedAddons: [],
       total: model.price,
+      quantity,
     });
     navigate("/checkout");
   };
@@ -180,7 +194,7 @@ export function ProductDetail() {
             <ChevronRight className="w-4 h-4" />
             <Link
               to={category.id === 'doors'
-                ? `/category/${category.id}/${subcategory.id}/structures`
+                ? `/categories?category=${category.id}&subcategory=${subcategory.id}`
                 : `/category/${category.id}`
               }
               className="hover:text-foreground"
@@ -256,54 +270,125 @@ export function ProductDetail() {
                 </div>
               </div>
             ) : (
-              <div className="bg-card border border-border rounded-lg p-4 mt-2">
-                <h2 className="text-lg mb-3 flex items-center gap-2">
-                  <Package className="w-4 h-4" />
-                  Customize Specifications
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                  {Object.entries(model.specifications).map(([key, value]) => {
-                    if (!Array.isArray(value) || value.length <= 1) {
-                      return (
-                        <div key={key} className="pb-2 flex flex-col justify-end">
-                          <div className="text-[11px] text-muted-foreground uppercase tracking-wider mb-0.5">
-                            {key.replace(/([A-Z])/g, " $1").trim()}
-                          </div>
-                          <div className="font-mono text-[15px] font-medium text-foreground">{Array.isArray(value) ? value[0] : value}</div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div key={key} className="space-y-2 pb-3 border-b border-border/20 last:border-0">
-                        <div className="text-[11px] text-muted-foreground uppercase tracking-wider">
-                          {key.replace(/([A-Z])/g, " $1").trim()}
-                        </div>
+              <>
+                {category.id === 'doors' && (
+                  <div className="bg-card border border-border rounded-lg p-4 mt-2 mb-4">
+                    <h2 className="text-lg mb-4 flex items-center gap-2">
+                      <Package className="w-4 h-4" />
+                      Product Configuration
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                      <div>
+                        <div className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">Category</div>
                         <div className="flex flex-wrap gap-2">
-                          {value.map((option) => (
+                          {[
+                            { id: 'core', name: 'CORE' },
+                            { id: 'core-md', name: 'CORE MD' },
+                            { id: 'stellar', name: 'STELLAR' }
+                          ].map(cat => (
                             <button
-                              key={option}
-                              onClick={() => handleSpecSelect(key, option)}
-                              className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${selectedSpecs[key] === option
+                              key={cat.id}
+                              onClick={() => {
+                                const isCD = model.id.endsWith('cd') || model.id.includes('-cd');
+                                navigate(`/product/${cat.id}-${isCD ? 'cd' : 'ld'}`);
+                              }}
+                              className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${subcategory.id === cat.id
                                 ? "border-primary bg-primary/10 text-primary shadow-sm"
                                 : "border-border/50 hover:border-primary/40 text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
                                 }`}
                             >
-                              {option}
-                              {key.toLowerCase().includes('width') || key.toLowerCase().includes('height') ? ' mm' : ''}
+                              {cat.name}
                             </button>
                           ))}
                         </div>
                       </div>
-                    );
-                  })}
+                      <div>
+                        <div className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">Structure</div>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { id: 'ld', name: 'Landing Door (LD)' },
+                            { id: 'cd', name: 'Car Door (CD)' }
+                          ].map(struct => {
+                            const isSelected = model.id.endsWith(struct.id) || model.id.includes(`-${struct.id}`);
+                            return (
+                              <button
+                                key={struct.id}
+                                onClick={() => navigate(`/product/${subcategory.id}-${struct.id}`)}
+                                className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${isSelected
+                                  ? "border-primary bg-primary/10 text-primary shadow-sm"
+                                  : "border-border/50 hover:border-primary/40 text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
+                                  }`}
+                              >
+                                {struct.name}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-card border border-border rounded-lg p-4 mt-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg flex items-center gap-2">
+                      <Package className="w-4 h-4" />
+                      Customize Specifications
+                    </h2>
+
+                    {/* Mobile Settings Icon */}
+                    <button
+                      onClick={() => setIsMobileSummaryOpen(true)}
+                      className="lg:hidden p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label="View Order Summary"
+                    >
+                      <Settings className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    {Object.entries(model.specifications).map(([key, value]) => {
+                      if (!Array.isArray(value) || value.length <= 1) {
+                        return (
+                          <div key={key} className="pb-2 flex flex-col justify-end">
+                            <div className="text-[11px] text-muted-foreground uppercase tracking-wider mb-0.5">
+                              {key.replace(/([A-Z])/g, " $1").trim()}
+                            </div>
+                            <div className="font-mono text-[15px] font-medium text-foreground">{Array.isArray(value) ? value[0] : value}</div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={key} className="space-y-2 pb-3 border-b border-border/20 last:border-0">
+                          <div className="text-[11px] text-muted-foreground uppercase tracking-wider">
+                            {key.replace(/([A-Z])/g, " $1").trim()}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {value.map((option) => (
+                              <button
+                                key={option}
+                                onClick={() => handleSpecSelect(key, option)}
+                                className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${selectedSpecs[key] === option
+                                  ? "border-primary bg-primary/10 text-primary shadow-sm"
+                                  : "border-border/50 hover:border-primary/40 text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
+                                  }`}
+                              >
+                                {option}
+                                {key.toLowerCase().includes('width') || key.toLowerCase().includes('height') ? ' mm' : ''}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
 
-          {/* Price Summary Sidebar - Sticky */}
-          <div className="lg:col-span-5">
+          {/* Desktop Price Summary Sidebar - Sticky */}
+          <div className="hidden lg:block lg:col-span-5">
             <div className="sticky top-24">
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -333,8 +418,8 @@ export function ProductDetail() {
                           key={idx}
                           ref={el => { if (spec.originalKey) specRefs.current[spec.originalKey] = el; }}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all duration-300 ${isHighlighted
-                              ? "bg-primary/20 border-primary ring-1 ring-primary ring-offset-1 ring-offset-background/50 scale-110 z-10"
-                              : "bg-secondary/50 border-border/50"
+                            ? "bg-primary/20 border-primary ring-1 ring-primary ring-offset-1 ring-offset-background/50 scale-110 z-10"
+                            : "bg-secondary/50 border-border/50"
                             }`}
                         >
                           <span className={`text-[11px] uppercase tracking-wider transition-colors ${isHighlighted ? "text-primary font-bold" : "text-muted-foreground"}`}>{spec.label}:</span>
@@ -373,48 +458,79 @@ export function ProductDetail() {
 
                 {/* CTA Buttons */}
                 <div className="space-y-3">
-                  <div className="flex gap-2">
+                  {!isConfirmed ? (
                     <button
-                      onClick={handleAddToCart}
-                      disabled={isAdded}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
-                        ? "bg-green-600 text-white"
-                        : "bg-secondary hover:bg-secondary/80 text-foreground"
-                        }`}
+                      onClick={() => setIsConfirmed(true)}
+                      className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <AnimatePresence mode="wait">
-                        {isAdded ? (
-                          <motion.div
-                            key="check"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0 }}
-                          >
-                            <CheckCircle2 className="w-5 h-5" />
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            key="cart"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0 }}
-                          >
-                            <ShoppingCart className="w-5 h-5" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                      <span className="font-semibold">
-                        {isAdded ? "Added to Cart" : "Add to Cart"}
-                      </span>
+                      <CheckCircle2 className="w-5 h-5" />
+                      Confirm Configuration
                     </button>
-                    <button
-                      onClick={handleBuyNow}
-                      className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm"
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-                  <button className="w-full px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors text-sm">
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between bg-secondary/30 p-2 rounded-lg border border-border">
+                        <span className="text-sm font-medium px-2">Quantity</span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer disabled:opacity-50"
+                            disabled={quantity <= 1}
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="font-mono font-medium w-4 text-center">{quantity}</span>
+                          <button
+                            onClick={() => setQuantity(quantity + 1)}
+                            className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleAddToCart}
+                          disabled={isAdded}
+                          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
+                            ? "bg-green-600 text-white"
+                            : "bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
+                            }`}
+                        >
+                          <AnimatePresence mode="wait">
+                            {isAdded ? (
+                              <motion.div
+                                key="check"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                exit={{ scale: 0 }}
+                              >
+                                <CheckCircle2 className="w-5 h-5" />
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="cart"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                exit={{ scale: 0 }}
+                              >
+                                <ShoppingCart className="w-5 h-5" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                          <span className="font-semibold">
+                            {isAdded ? "Added to Cart" : "Add to Cart"}
+                          </span>
+                        </button>
+                        <button
+                          onClick={handleBuyNow}
+                          className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm cursor-pointer"
+                        >
+                          Buy Now
+                        </button>
+                      </div>
+                    </>
+                  )}
+                  <button className="w-full px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors text-sm cursor-pointer">
                     Request Quote
                   </button>
                 </div>
@@ -438,6 +554,167 @@ export function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Settings Popup/Overlay */}
+      <AnimatePresence>
+        {isMobileSummaryOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileSummaryOpen(false)}
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 lg:hidden"
+            />
+
+            {/* Popup Card */}
+            <motion.div
+              initial={{ opacity: 0, y: "100%" }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-8 lg:hidden"
+            >
+              <div className="bg-card border border-border/50 shadow-2xl rounded-2xl p-6 relative overflow-hidden">
+                {/* Decorative background glow */}
+                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
+
+                <button
+                  onClick={() => setIsMobileSummaryOpen(false)}
+                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                <h2 className="text-xl mb-4 flex items-center gap-2 font-medium">
+                  <Shield className="w-5 h-5 text-primary" />
+                  Summary & Price
+                </h2>
+
+                <div className="mb-4 pb-4 border-b border-border">
+                  <div className="font-semibold text-xl mb-1 text-primary">{selectedItem ? selectedItem.description : model.name}</div>
+                  <div className="text-sm font-mono text-muted-foreground mb-4">{selectedItem ? selectedItem.code : subcategory.name}</div>
+
+                  <div
+                    className="flex flex-wrap gap-2 max-h-[30vh] overflow-y-auto pr-2 pb-2 custom-scrollbar scroll-smooth"
+                  >
+                    {quickSpecs.filter(s => s.label !== "Base Price").map((spec, idx) => (
+                      <div
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border bg-secondary/50 border-border/50"
+                      >
+                        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{spec.label}:</span>
+                        <span className="text-xs font-mono font-medium">{spec.value}</span>
+                      </div>
+                    )
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6 relative z-10">
+                  {/* Base Price */}
+                  <div className="flex justify-between pb-2">
+                    <div className="text-sm text-muted-foreground font-medium">Base Price</div>
+                    <div className="font-mono text-muted-foreground">${model.price.toLocaleString()}</div>
+                  </div>
+
+                  <div className="flex justify-between pt-3 border-t border-border/50 relative">
+                    <div className="absolute left-0 bottom-0 w-full h-8 bg-primary/5 blur-xl pointer-events-none" />
+                    <div>
+                      <div className="text-sm text-foreground uppercase tracking-widest font-bold">
+                        Total Price
+                      </div>
+                    </div>
+                    <div className="text-3xl font-mono font-bold text-foreground">
+                      ${model.price.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA Buttons */}
+                <div className="space-y-3">
+                  {!isConfirmed ? (
+                    <button
+                      onClick={() => setIsConfirmed(true)}
+                      className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-5 h-5" />
+                      Confirm Configuration
+                    </button>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between bg-secondary/30 p-2 rounded-lg border border-border">
+                        <span className="text-sm font-medium px-2">Quantity</span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer disabled:opacity-50"
+                            disabled={quantity <= 1}
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="font-mono font-medium w-4 text-center">{quantity}</span>
+                          <button
+                            onClick={() => setQuantity(quantity + 1)}
+                            className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            handleAddToCart();
+                            setTimeout(() => setIsMobileSummaryOpen(false), 2000);
+                          }}
+                          disabled={isAdded}
+                          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
+                            ? "bg-green-600 text-white"
+                            : "bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
+                            }`}
+                        >
+                          <AnimatePresence mode="wait">
+                            {isAdded ? (
+                              <motion.div
+                                key="check"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                exit={{ scale: 0 }}
+                              >
+                                <CheckCircle2 className="w-5 h-5" />
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="cart"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                exit={{ scale: 0 }}
+                              >
+                                <ShoppingCart className="w-5 h-5" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                          <span className="font-semibold">
+                            {isAdded ? "Added to Cart" : "Add to Cart"}
+                          </span>
+                        </button>
+                        <button
+                          onClick={handleBuyNow}
+                          className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm cursor-pointer"
+                        >
+                          Buy Now
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
