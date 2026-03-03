@@ -21,6 +21,14 @@ export function CartProvider({ children }) {
 
     const addToCart = (item) => {
         setCart((prev) => {
+            if (item.quantity === 0) {
+                return prev.filter(i => !(
+                    i.model.id === item.model.id &&
+                    JSON.stringify(i.selectedSpecs) === JSON.stringify(item.selectedSpecs) &&
+                    i.selectedItem?.code === item.selectedItem?.code
+                ));
+            }
+
             // Check if item with same configuration already exists
             const existing = prev.find((i) =>
                 i.model.id === item.model.id &&
@@ -30,7 +38,7 @@ export function CartProvider({ children }) {
 
             if (existing) {
                 return prev.map((i) =>
-                    i === existing ? { ...i, quantity: i.quantity + (item.quantity || 1) } : i
+                    i === existing ? { ...i, quantity: item.isUpdateOnly ? item.quantity : i.quantity + (item.quantity || 1) } : i
                 );
             }
             return [...prev, { ...item, cartId: Date.now(), quantity: item.quantity || 1 }];

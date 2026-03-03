@@ -214,25 +214,27 @@ export function Categories() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      addToCart({
-                        model,
-                        subcategory: subcat,
-                        category,
-                        selectedSpecs: calculateDefaultSpecs(model),
-                        selectedItem: isItem ? item : null,
-                        selectedAddons: [],
-                        total: model.price,
-                      });
-                    }}
-                    className="w-9 h-9 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all flex-shrink-0"
-                    title="Add to Cart"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                  isItem && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addToCart({
+                          model,
+                          subcategory: subcat,
+                          category,
+                          selectedSpecs: calculateDefaultSpecs(model),
+                          selectedItem: item,
+                          selectedAddons: [],
+                          total: model.price,
+                        });
+                      }}
+                      className="w-9 h-9 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all flex-shrink-0"
+                      title="Add to Cart"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )
                 )}
               </div>
             </div>
@@ -309,24 +311,26 @@ export function Categories() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addToCart({
-                    model,
-                    subcategory: subcat,
-                    category,
-                    selectedSpecs: calculateDefaultSpecs(model),
-                    selectedItem: isItem ? item : null,
-                    selectedAddons: [],
-                    total: model.price,
-                  });
-                }}
-                className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
-                title="Add to Cart"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              isItem && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart({
+                      model,
+                      subcategory: subcat,
+                      category,
+                      selectedSpecs: calculateDefaultSpecs(model),
+                      selectedItem: item,
+                      selectedAddons: [],
+                      total: model.price,
+                    });
+                  }}
+                  className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                  title="Add to Cart"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              )
             )}
           </div>
         </div>

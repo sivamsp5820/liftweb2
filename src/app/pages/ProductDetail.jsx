@@ -34,11 +34,11 @@ export function ProductDetail() {
   const variantCode = queryParams.get("variant");
 
   const [isConfirmed, setIsConfirmed] = useState(!!variantCode);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
 
   useEffect(() => {
     setIsConfirmed(!!variantCode);
-    setQuantity(1);
+    setQuantity(0);
     setIsAdded(false);
   }, [variantCode]);
 
@@ -463,15 +463,51 @@ export function ProductDetail() {
                         <span className="text-sm font-medium px-2">Quantity</span>
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            onClick={() => {
+                              const newQuantity = Math.max(0, quantity - 1);
+                              setQuantity(newQuantity);
+                              if (newQuantity === 0 && !variantCode) {
+                                // if 0 and base model, do not attempt to add to cart
+                              } else {
+                                addToCart({
+                                  model,
+                                  subcategory,
+                                  category,
+                                  selectedSpecs,
+                                  selectedItem,
+                                  selectedAddons: [],
+                                  total: model.price,
+                                  quantity: newQuantity,
+                                  isUpdateOnly: true
+                                });
+                                setIsAdded(true);
+                                setTimeout(() => setIsAdded(false), 2000);
+                              }
+                            }}
                             className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer disabled:opacity-50"
-                            disabled={quantity <= 1}
+                            disabled={quantity <= 0}
                           >
                             <Minus className="w-4 h-4" />
                           </button>
                           <span className="font-mono font-medium w-4 text-center">{quantity}</span>
                           <button
-                            onClick={() => setQuantity(quantity + 1)}
+                            onClick={() => {
+                              const newQuantity = quantity + 1;
+                              setQuantity(newQuantity);
+                              addToCart({
+                                model,
+                                subcategory,
+                                category,
+                                selectedSpecs,
+                                selectedItem,
+                                selectedAddons: [],
+                                total: model.price,
+                                quantity: newQuantity,
+                                isUpdateOnly: true
+                              });
+                              setIsAdded(true);
+                              setTimeout(() => setIsAdded(false), 2000);
+                            }}
                             className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer"
                           >
                             <Plus className="w-4 h-4" />
@@ -479,42 +515,45 @@ export function ProductDetail() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button
-                          onClick={handleAddToCart}
-                          disabled={isAdded}
-                          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
-                            ? "bg-green-600 text-white"
-                            : "bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
-                            }`}
-                        >
-                          <AnimatePresence mode="wait">
-                            {isAdded ? (
-                              <motion.div
-                                key="check"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ scale: 0 }}
-                              >
-                                <CheckCircle2 className="w-5 h-5" />
-                              </motion.div>
-                            ) : (
-                              <motion.div
-                                key="cart"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ scale: 0 }}
-                              >
-                                <ShoppingCart className="w-5 h-5" />
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                          <span className="font-semibold">
-                            {isAdded ? "Added to Cart" : "Add to Cart"}
-                          </span>
-                        </button>
+                        {!!variantCode && (
+                          <button
+                            onClick={handleAddToCart}
+                            disabled={isAdded || quantity === 0}
+                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
+                              ? "bg-green-600 text-white"
+                              : "bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
+                              } disabled:opacity-50`}
+                          >
+                            <AnimatePresence mode="wait">
+                              {isAdded ? (
+                                <motion.div
+                                  key="check"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  exit={{ scale: 0 }}
+                                >
+                                  <CheckCircle2 className="w-5 h-5" />
+                                </motion.div>
+                              ) : (
+                                <motion.div
+                                  key="cart"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  exit={{ scale: 0 }}
+                                >
+                                  <ShoppingCart className="w-5 h-5" />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                            <span className="font-semibold">
+                              {isAdded ? "Added to Cart" : "Add to Cart"}
+                            </span>
+                          </button>
+                        )}
                         <button
                           onClick={handleBuyNow}
-                          className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm cursor-pointer"
+                          disabled={quantity === 0}
+                          className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm cursor-pointer disabled:opacity-50"
                         >
                           Buy Now
                         </button>
@@ -662,15 +701,51 @@ export function ProductDetail() {
                         <span className="text-sm font-medium px-2">Quantity</span>
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            onClick={() => {
+                              const newQuantity = Math.max(0, quantity - 1);
+                              setQuantity(newQuantity);
+                              if (newQuantity === 0 && !variantCode) {
+                                // if 0 and base model, do not attempt to add to cart
+                              } else {
+                                addToCart({
+                                  model,
+                                  subcategory,
+                                  category,
+                                  selectedSpecs,
+                                  selectedItem,
+                                  selectedAddons: [],
+                                  total: model.price,
+                                  quantity: newQuantity,
+                                  isUpdateOnly: true
+                                });
+                                setIsAdded(true);
+                                setTimeout(() => setIsAdded(false), 2000);
+                              }
+                            }}
                             className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer disabled:opacity-50"
-                            disabled={quantity <= 1}
+                            disabled={quantity <= 0}
                           >
                             <Minus className="w-4 h-4" />
                           </button>
                           <span className="font-mono font-medium w-4 text-center">{quantity}</span>
                           <button
-                            onClick={() => setQuantity(quantity + 1)}
+                            onClick={() => {
+                              const newQuantity = quantity + 1;
+                              setQuantity(newQuantity);
+                              addToCart({
+                                model,
+                                subcategory,
+                                category,
+                                selectedSpecs,
+                                selectedItem,
+                                selectedAddons: [],
+                                total: model.price,
+                                quantity: newQuantity,
+                                isUpdateOnly: true
+                              });
+                              setIsAdded(true);
+                              setTimeout(() => setIsAdded(false), 2000);
+                            }}
                             className="w-8 h-8 flex items-center justify-center rounded-md bg-background border border-border hover:bg-secondary transition-colors cursor-pointer"
                           >
                             <Plus className="w-4 h-4" />
@@ -678,45 +753,48 @@ export function ProductDetail() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            handleAddToCart();
-                            setTimeout(() => setIsMobileSummaryOpen(false), 2000);
-                          }}
-                          disabled={isAdded}
-                          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
-                            ? "bg-green-600 text-white"
-                            : "bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
-                            }`}
-                        >
-                          <AnimatePresence mode="wait">
-                            {isAdded ? (
-                              <motion.div
-                                key="check"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ scale: 0 }}
-                              >
-                                <CheckCircle2 className="w-5 h-5" />
-                              </motion.div>
-                            ) : (
-                              <motion.div
-                                key="cart"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ scale: 0 }}
-                              >
-                                <ShoppingCart className="w-5 h-5" />
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                          <span className="font-semibold">
-                            {isAdded ? "Added to Cart" : "Add to Cart"}
-                          </span>
-                        </button>
+                        {!!variantCode && (
+                          <button
+                            onClick={(e) => {
+                              handleAddToCart();
+                              setTimeout(() => setIsMobileSummaryOpen(false), 2000);
+                            }}
+                            disabled={isAdded || quantity === 0}
+                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all text-sm ${isAdded
+                              ? "bg-green-600 text-white"
+                              : "bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
+                              } disabled:opacity-50`}
+                          >
+                            <AnimatePresence mode="wait">
+                              {isAdded ? (
+                                <motion.div
+                                  key="check"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  exit={{ scale: 0 }}
+                                >
+                                  <CheckCircle2 className="w-5 h-5" />
+                                </motion.div>
+                              ) : (
+                                <motion.div
+                                  key="cart"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  exit={{ scale: 0 }}
+                                >
+                                  <ShoppingCart className="w-5 h-5" />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                            <span className="font-semibold">
+                              {isAdded ? "Added to Cart" : "Add to Cart"}
+                            </span>
+                          </button>
+                        )}
                         <button
                           onClick={handleBuyNow}
-                          className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm cursor-pointer"
+                          disabled={quantity === 0}
+                          className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm cursor-pointer disabled:opacity-50"
                         >
                           Buy Now
                         </button>

@@ -589,6 +589,16 @@ export function Checkout() {
                       placeholder="Any special requirements, preferred installation timeline, or questions..."
                     />
                   </div>
+
+                  <div className="">
+                    <button
+                      type="submit"
+                      form="checkout-form"
+                      className="w-full px-6 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold shadow-xl shadow-primary/20"
+                    >
+                      {formData.paymentMethod === "quote" ? "Submit Quote Request" : "Continue to Payment"}
+                    </button>
+                  </div>
                 </div>
               </div>
 
