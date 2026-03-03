@@ -4,6 +4,7 @@ import { liftModels, liftCategories, liftSubcategories } from "../data/lifts";
 import { motion, AnimatePresence } from "motion/react";
 import { useViewMode } from "../context/ViewModeContext";
 import { useCart } from "../context/CartContext";
+import { CategorySidebar } from "../components/CategorySidebar";
 
 export function Variants() {
     const { categoryId, subcategoryId, productId } = useParams();
@@ -50,145 +51,118 @@ export function Variants() {
         );
     };
 
+    const handleCategoryClick = (catId) => {
+        navigate(`/categories?category=${catId}`);
+    };
+
+    const handleSubcategoryClick = (subId) => {
+        const subcat = liftSubcategories.find(s => s.id === subId);
+        const catId = subcat ? subcat.categoryId : "all";
+        navigate(`/categories?category=${catId}&subcategory=${subId}`);
+    };
+
+    const handleDoorTypeClick = (type) => {
+        navigate(`/categories?category=doors&doorType=${type}`);
+    };
+
     return (
-        <div className="w-full">
-            {/* Breadcrumb */}
-            <div className="bg-secondary/30 py-2 border-b border-border">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Link to="/categories" className="hover:text-foreground">
-                            Categories
-                        </Link>
-                        <ChevronRight className="w-4 h-4" />
-                        <Link
-                            to={category.id === 'doors' ? `/categories?category=${category.id}` : `/category/${category.id}`}
-                            className="hover:text-foreground"
-                        >
-                            {category.name}
-                        </Link>
-                        <ChevronRight className="w-4 h-4" />
-                        <Link
-                            to={category.id === 'doors' ? `/categories?category=${category.id}&subcategory=${subcategory.id}` : `/category/${category.id}`}
-                            className="hover:text-foreground"
-                        >
-                            {subcategory.name}
-                        </Link>
-                        <ChevronRight className="w-4 h-4" />
-                        <span className="text-foreground">{model.name}</span>
+        <div className="w-full flex">
+            {/* Sidebar Filter */}
+            <CategorySidebar
+                selectedCategory={category?.id || "all"}
+                selectedSubcategory={subcategory?.id || "all"}
+                selectedDoorType={model?.specifications?.doorType || "all"}
+                onCategoryClick={handleCategoryClick}
+                onSubcategoryClick={handleSubcategoryClick}
+                onDoorTypeClick={handleDoorTypeClick}
+            />
+
+            <main className="flex-1 w-full bg-background min-h-screen pb-20">
+                {/* Breadcrumb */}
+                <div className="bg-secondary/30 py-2 border-b border-border">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Link to="/categories" className="hover:text-foreground">
+                                Categories
+                            </Link>
+                            <ChevronRight className="w-4 h-4" />
+                            <Link
+                                to={category.id === 'doors' ? `/categories?category=${category.id}` : `/category/${category.id}`}
+                                className="hover:text-foreground"
+                            >
+                                {category.name}
+                            </Link>
+                            <ChevronRight className="w-4 h-4" />
+                            <Link
+                                to={category.id === 'doors' ? `/categories?category=${category.id}&subcategory=${subcategory.id}` : `/category/${category.id}`}
+                                className="hover:text-foreground"
+                            >
+                                {subcategory.name}
+                            </Link>
+                            <ChevronRight className="w-4 h-4" />
+                            <span className="text-foreground">{model.name}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Header */}
-            <section className="py-8 border-b border-border bg-secondary/10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-5xl mx-auto text-center md:text-left"
-                    >
-                        <div className="flex-1">
-                            <h1 className="text-3xl md:text-4xl mb-2 tracking-tight">
-                                Select {model.name} Variant
-                            </h1>
-                            <p className="text-base text-muted-foreground">
-                                Choose the specific {model.name} configuration based on your requirements.
-                            </p>
-                        </div>
-                        <div>
-                            <Link
-                                to={`/product/${model.id}`}
-                                className="inline-flex items-center justify-center gap-2 py-2 px-4 bg-primary text-primary-foreground rounded-lg transition-all font-semibold shadow hover:opacity-90 whitespace-nowrap text-sm"
-                            >
-                                <span>Choose New Combo</span>
-                            </Link>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Content */}
-            <section className="py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <AnimatePresence mode="wait">
+                {/* Header */}
+                <section className="py-8 border-b border-border bg-secondary/10">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div
-                            key={viewMode}
-                            initial={{ opacity: 0, x: viewMode === 'visual' ? -20 : 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: viewMode === 'visual' ? 20 : -20 }}
-                            className={viewMode === 'visual' ? "grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto" : "max-w-5xl mx-auto space-y-4"}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-5xl mx-auto text-center md:text-left"
                         >
-                            {items.map((item, index) => {
-                                const cartItem = getCartItem(item);
-                                return (
-                                    <motion.div
-                                        key={item.code}
-                                        variants={{
-                                            initial: { opacity: 0, y: 20 },
-                                            animate: { opacity: 1, y: 0 }
-                                        }}
-                                        initial="initial"
-                                        animate="animate"
-                                        whileHover="hover"
-                                        transition={{ delay: index * 0.05 }}
-                                    >
-                                        <div className="group flex flex-col md:flex-row md:items-center gap-3">
-                                            <div
-                                                onClick={() => {
-                                                    if (!cartItem) {
-                                                        addToCart({
-                                                            model,
-                                                            subcategory,
-                                                            category,
-                                                            selectedSpecs: defaultSpecs,
-                                                            selectedItem: item,
-                                                            selectedAddons: [],
-                                                            total: model.price,
-                                                        });
-                                                    } else {
-                                                        updateQuantity(cartItem.cartId, 1);
-                                                    }
-                                                }}
-                                                className="flex-1 flex items-center justify-between gap-4 bg-card border border-border rounded-xl p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-md cursor-pointer"
-                                            >
-                                                <div className="flex-1">
-                                                    <h3 className="text-lg font-medium group-hover:text-primary transition-colors mb-1 line-clamp-2">
-                                                        {item.description}
-                                                    </h3>
-                                                    <div className="text-sm font-mono text-muted-foreground">
-                                                        {item.code} • {item.subDescription}
-                                                    </div>
-                                                </div>
+                            <div className="flex-1">
+                                <h1 className="text-3xl md:text-4xl mb-2 tracking-tight">
+                                    Select {model.name} Variant
+                                </h1>
+                                <p className="text-base text-muted-foreground">
+                                    Choose the specific {model.name} configuration based on your requirements.
+                                </p>
+                            </div>
+                            <div>
+                                <Link
+                                    to={`/product/${model.id}`}
+                                    className="inline-flex items-center justify-center gap-2 py-2 px-4 bg-primary text-primary-foreground rounded-lg transition-all font-semibold shadow hover:opacity-90 whitespace-nowrap text-sm"
+                                >
+                                    <span>Choose New Combo</span>
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
 
-                                                {cartItem ? (
-                                                    <div className="flex items-center gap-3 bg-secondary rounded-full p-1" onClick={(e) => e.stopPropagation()}>
-                                                        <button
-                                                            onClick={() => {
-                                                                if (cartItem.quantity > 1) {
-                                                                    updateQuantity(cartItem.cartId, -1);
-                                                                } else {
-                                                                    removeFromCart(cartItem.cartId);
-                                                                }
-                                                            }}
-                                                            className="w-10 h-10 flex items-center justify-center bg-background hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all shadow-sm flex-shrink-0"
-                                                        >
-                                                            <Minus className="w-4 h-4" />
-                                                        </button>
-                                                        <span className="w-4 text-center font-medium">
-                                                            {cartItem.quantity}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => updateQuantity(cartItem.cartId, 1)}
-                                                            className="w-10 h-10 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all shadow-sm flex-shrink-0"
-                                                        >
-                                                            <Plus className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
+                {/* Content */}
+                <section className="py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={viewMode}
+                                initial={{ opacity: 0, x: viewMode === 'visual' ? -20 : 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: viewMode === 'visual' ? 20 : -20 }}
+                                className={viewMode === 'visual' ? "grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto" : "max-w-5xl mx-auto space-y-4"}
+                            >
+                                {items.map((item, index) => {
+                                    const cartItem = getCartItem(item);
+                                    return (
+                                        <motion.div
+                                            key={item.code}
+                                            variants={{
+                                                initial: { opacity: 0, y: 20 },
+                                                animate: { opacity: 1, y: 0 }
+                                            }}
+                                            initial="initial"
+                                            animate="animate"
+                                            whileHover="hover"
+                                            transition={{ delay: index * 0.05 }}
+                                        >
+                                            <div className="group flex flex-col md:flex-row md:items-center gap-3">
+                                                <div
+                                                    onClick={() => {
+                                                        if (!cartItem) {
                                                             addToCart({
                                                                 model,
                                                                 subcategory,
@@ -198,31 +172,84 @@ export function Variants() {
                                                                 selectedAddons: [],
                                                                 total: model.price,
                                                             });
-                                                        }}
-                                                        className="w-12 h-12 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
-                                                        title="Add to Cart"
-                                                    >
-                                                        <Plus className="w-5 h-5" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                )
-                            })}
-                        </motion.div>
-                    </AnimatePresence>
+                                                        } else {
+                                                            updateQuantity(cartItem.cartId, 1);
+                                                        }
+                                                    }}
+                                                    className="flex-1 flex items-center justify-between gap-4 bg-card border border-border rounded-xl p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-md cursor-pointer"
+                                                >
+                                                    <div className="flex-1">
+                                                        <h3 className="text-lg font-medium group-hover:text-primary transition-colors mb-1 line-clamp-2">
+                                                            {item.description}
+                                                        </h3>
+                                                        <div className="text-sm font-mono text-muted-foreground">
+                                                            {item.code} • {item.subDescription}
+                                                        </div>
+                                                    </div>
 
-                    <div className="mt-8 flex justify-center">
-                        <Link
-                            to="/categories"
-                            className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-primary text-primary-foreground rounded-full transition-all hover:opacity-90 font-semibold shadow-md"
-                        >
-                            Choose New Lift
-                        </Link>
+                                                    {cartItem ? (
+                                                        <div className="flex items-center gap-3 bg-secondary rounded-full p-1" onClick={(e) => e.stopPropagation()}>
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (cartItem.quantity > 1) {
+                                                                        updateQuantity(cartItem.cartId, -1);
+                                                                    } else {
+                                                                        removeFromCart(cartItem.cartId);
+                                                                    }
+                                                                }}
+                                                                className="w-10 h-10 flex items-center justify-center bg-background hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                                                            >
+                                                                <Minus className="w-4 h-4" />
+                                                            </button>
+                                                            <span className="w-4 text-center font-medium">
+                                                                {cartItem.quantity}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => updateQuantity(cartItem.cartId, 1)}
+                                                                className="w-10 h-10 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all shadow-sm flex-shrink-0"
+                                                            >
+                                                                <Plus className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                addToCart({
+                                                                    model,
+                                                                    subcategory,
+                                                                    category,
+                                                                    selectedSpecs: defaultSpecs,
+                                                                    selectedItem: item,
+                                                                    selectedAddons: [],
+                                                                    total: model.price,
+                                                                });
+                                                            }}
+                                                            className="w-12 h-12 flex items-center justify-center bg-secondary hover:bg-primary hover:text-primary-foreground rounded-full transition-all shadow-sm flex-shrink-0"
+                                                            title="Add to Cart"
+                                                        >
+                                                            <Plus className="w-5 h-5" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )
+                                })}
+                            </motion.div>
+                        </AnimatePresence>
+
+                        <div className="mt-8 flex justify-center">
+                            <Link
+                                to="/categories"
+                                className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-primary text-primary-foreground rounded-full transition-all hover:opacity-90 font-semibold shadow-md"
+                            >
+                                Choose New Lift
+                            </Link>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </main>
         </div>
     );
 }

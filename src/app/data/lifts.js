@@ -7,13 +7,6 @@ export const liftCategories = [
     description: 'Premium door systems and components for elevator installations',
     image: 'https://images.unsplash.com/photo-1702483907449-7516bd7608a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGV2YXRvciUyMGNvbnRyb2wlMjBwYW5lbHxlbnwxfHx8fDE3NzE5MTQxNDl8MA&ixlib=rb-4.1.0&q=80&w=1080',
     subcategories: ['CORE', 'CORE MD', 'STELLAR']
-  },
-  {
-    id: 'non-doors',
-    name: 'Non Doors',
-    description: 'Essential lift components including cabins, mechanisms, and control systems',
-    image: 'https://images.unsplash.com/photo-1765048808260-9f48d96caf98?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbmR1c3RyaWFsJTIwbGlmdCUyMG1hbnVmYWN0dXJpbmd8ZW58MXx8fHwxNzcxOTE0MTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    subcategories: ['CABIN', 'SLING', 'MECHANISM', 'SYSTEM WITH', 'OL20', 'SAFETY GEAR']
   }
 ];
 
