@@ -236,7 +236,7 @@ export function Auth() {
                                                     <input
                                                         type="text"
                                                         required
-                                                        className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                        className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1CA7A6]/20 focus:border-[#1CA7A6] hover:border-[#1CA7A6] transition-all"
                                                         placeholder="Jane"
                                                     />
                                                 </div>
@@ -256,7 +256,7 @@ export function Auth() {
                                                     <input
                                                         type="text"
                                                         required
-                                                        className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                        className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1CA7A6]/20 focus:border-[#1CA7A6] hover:border-[#1CA7A6] transition-all"
                                                         placeholder="Doe"
                                                     />
                                                 </div>
@@ -278,7 +278,7 @@ export function Auth() {
                                                 <input
                                                     type="text"
                                                     required
-                                                    className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                    className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1CA7A6]/20 focus:border-[#1CA7A6] hover:border-[#1CA7A6] transition-all"
                                                     placeholder="Acme Elevators Ltd."
                                                 />
                                             </div>
@@ -302,7 +302,7 @@ export function Auth() {
                                             <input
                                                 type="email"
                                                 required
-                                                className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1CA7A6]/20 focus:border-[#1CA7A6] hover:border-[#1CA7A6] transition-all"
                                                 placeholder="name@company.com"
                                             />
                                         </div>
@@ -330,7 +330,7 @@ export function Auth() {
                                             <input
                                                 type="password"
                                                 required
-                                                className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1CA7A6]/20 focus:border-[#1CA7A6] hover:border-[#1CA7A6] transition-all"
                                                 placeholder="••••••••"
                                             />
                                         </div>
@@ -343,7 +343,7 @@ export function Auth() {
                                         hidden: { opacity: 0, y: 10 },
                                         visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
                                     }}
-                                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 border border-foreground bg-transparent text-foreground font-semibold rounded-lg hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] transition-colors"
                                 >
                                     {isLogin ? "Sign In" : "Create Account"}
                                     <ArrowRight className="w-4 h-4" />

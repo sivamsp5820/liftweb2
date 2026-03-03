@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router";
+import { useParams, Link, useNavigate, Navigate } from "react-router";
 import { ArrowRight, LayoutGrid, List, Plus, Settings, ChevronRight } from "lucide-react";
 import { liftCategories, liftSubcategories, liftModels } from "../data/lifts";
 import { motion, AnimatePresence } from "motion/react";
@@ -36,6 +36,10 @@ export function SubCategory() {
         </Link>
       </div>
     );
+  }
+
+  if (category.id === 'doors') {
+    return <Navigate to={`/categories?category=${category.id}`} replace />;
   }
 
   return (
@@ -131,7 +135,7 @@ export function SubCategory() {
                     >
                       <Link
                         to={targetUrl}
-                        className="group block bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all h-full"
+                        className="group block bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl hover:border-[#1CA7A6] transition-all h-full"
                       >
                         <div className="relative h-64 overflow-hidden bg-muted">
                           <img
@@ -176,7 +180,7 @@ export function SubCategory() {
                                     });
                                   }
                                 }}
-                                className="p-2 bg-secondary hover:bg-secondary/80 rounded-full transition-colors"
+                                className="p-2 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-full transition-colors"
                                 title="Add to Cart"
                               >
                                 <Plus className="w-4 h-4" />
@@ -199,7 +203,7 @@ export function SubCategory() {
                                     navigate(targetUrl);
                                   }
                                 }}
-                                className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5"
+                                className="px-3 py-1.5 border border-foreground bg-transparent text-foreground text-xs font-semibold rounded-lg hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] transition-colors flex items-center gap-1.5"
                               >
                                 <Settings className="w-3 h-3" />
                                 Customize
@@ -234,7 +238,7 @@ export function SubCategory() {
                     >
                       <Link
                         to={targetUrl}
-                        className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-card border border-border rounded-xl hover:border-primary/50 hover:shadow-md transition-all gap-6"
+                        className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-card border border-border rounded-xl hover:border-[#1CA7A6] hover:shadow-md transition-all gap-6"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
@@ -267,7 +271,7 @@ export function SubCategory() {
             )}
           </AnimatePresence>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 }

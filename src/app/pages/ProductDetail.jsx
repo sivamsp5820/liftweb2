@@ -186,7 +186,7 @@ export function ProductDetail() {
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link
-              to={`/category/${category.id}`}
+              to={category.id === 'doors' ? `/categories?category=${category.id}` : `/category/${category.id}`}
               className="hover:text-foreground"
             >
               {category.name}
@@ -294,7 +294,7 @@ export function ProductDetail() {
                               }}
                               className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${subcategory.id === cat.id
                                 ? "border-primary bg-primary/10 text-primary shadow-sm"
-                                : "border-border/50 hover:border-primary/40 text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
+                                : "border-border/50 hover:border-[#1CA7A6] text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
                                 }`}
                             >
                               {cat.name}
@@ -316,7 +316,7 @@ export function ProductDetail() {
                                 onClick={() => navigate(`/product/${subcategory.id}-${struct.id}`)}
                                 className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${isSelected
                                   ? "border-primary bg-primary/10 text-primary shadow-sm"
-                                  : "border-border/50 hover:border-primary/40 text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
+                                  : "border-border/50 hover:border-[#1CA7A6] text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
                                   }`}
                               >
                                 {struct.name}
@@ -361,7 +361,7 @@ export function ProductDetail() {
                                 onClick={() => handleSpecSelect(key, option)}
                                 className={`px-3 py-1.5 rounded-md border transition-all text-sm font-medium tracking-wide ${selectedSpecs[key] === option
                                   ? "border-primary bg-primary/10 text-primary shadow-sm"
-                                  : "border-border/50 hover:border-primary/40 text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
+                                  : "border-border/50 hover:border-[#1CA7A6] text-muted-foreground hover:text-foreground bg-secondary/10 hover:bg-secondary/30"
                                   }`}
                               >
                                 {option}
@@ -409,7 +409,7 @@ export function ProductDetail() {
                           key={idx}
                           ref={el => { if (spec.originalKey) specRefs.current[spec.originalKey] = el; }}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all duration-300 ${isHighlighted
-                            ? "bg-primary/20 border-primary ring-1 ring-primary ring-offset-1 ring-offset-background/50 scale-110 z-10"
+                            ? "bg-primary/20 border-[#1CA7A6] ring-1 ring-[#1CA7A6] ring-offset-1 ring-offset-background/50 scale-110 z-10"
                             : "bg-secondary/50 border-border/50"
                             }`}
                         >

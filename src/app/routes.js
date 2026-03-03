@@ -8,6 +8,7 @@ import { OrderConfirmation } from "./pages/OrderConfirmation";
 import { Variants } from "./pages/Variants";
 import { Cart } from "./pages/Cart";
 import { Auth } from "./pages/Auth";
+import { MyAccount } from "./pages/MyAccount";
 import { Layout } from "./components/Layout";
 
 export const router = createBrowserRouter([
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
       { path: "checkout", Component: Checkout },
       { path: "confirmation", Component: OrderConfirmation },
       { path: "auth", Component: Auth },
+      { path: "account", Component: MyAccount },
     ],
   },
 ]);

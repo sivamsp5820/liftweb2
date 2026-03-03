@@ -33,21 +33,21 @@ export function Layout() {
             <div className="hidden md:flex items-center gap-8">
               <Link
                 to="/"
-                className={`text-sm tracking-wide uppercase transition-colors ${isActive("/") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                className={`text-sm tracking-wide uppercase transition-colors ${isActive("/") ? "text-primary" : "text-muted-foreground hover:text-[#1CA7A6]"
                   }`}
               >
                 Home
               </Link>
               <Link
                 to="/categories"
-                className={`text-sm tracking-wide uppercase transition-colors ${isActive("/categories") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                className={`text-sm tracking-wide uppercase transition-colors ${isActive("/categories") ? "text-primary" : "text-muted-foreground hover:text-[#1CA7A6]"
                   }`}
               >
                 Products
               </Link>
               <Link
                 to="/cart"
-                className="relative flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                className="relative flex items-center gap-2 px-4 py-2 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg transition-colors"
               >
                 <ShoppingCart className="w-4 h-4" />
                 <span className="text-sm font-semibold">Cart</span>
@@ -58,18 +58,18 @@ export function Layout() {
                 )}
               </Link>
               <Link
-                to="/auth"
-                className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+                to="/account"
+                className="flex items-center gap-2 px-4 py-2 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg transition-colors"
               >
                 <User className="w-4 h-4" />
-                <span className="text-sm font-semibold">Sign In</span>
+                <span className="text-sm font-semibold">My Account</span>
               </Link>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2"
+              className="md:hidden p-2 hover:text-[#1CA7A6] transition-colors"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -82,7 +82,7 @@ export function Layout() {
                 <Link
                   to="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`text-sm tracking-wide uppercase transition-colors ${isActive("/") ? "text-primary" : "text-muted-foreground"
+                  className={`text-sm tracking-wide uppercase transition-colors ${isActive("/") ? "text-primary" : "text-muted-foreground hover:text-[#1CA7A6]"
                     }`}
                 >
                   Home
@@ -90,7 +90,7 @@ export function Layout() {
                 <Link
                   to="/categories"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`text-sm tracking-wide uppercase transition-colors ${isActive("/categories") ? "text-primary" : "text-muted-foreground"
+                  className={`text-sm tracking-wide uppercase transition-colors ${isActive("/categories") ? "text-primary" : "text-muted-foreground hover:text-[#1CA7A6]"
                     }`}
                 >
                   Products
@@ -98,18 +98,18 @@ export function Layout() {
                 <Link
                   to="/cart"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg justify-center relative"
+                  className="flex items-center gap-2 px-4 py-3 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg justify-center relative transition-colors"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span className="text-sm font-semibold">Cart ({cartCount})</span>
                 </Link>
                 <Link
-                  to="/auth"
+                  to="/account"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 bg-secondary text-secondary-foreground rounded-lg justify-center relative mt-2"
+                  className="flex items-center gap-2 px-4 py-3 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg justify-center relative mt-2 transition-colors"
                 >
                   <User className="w-5 h-5" />
-                  <span className="text-sm font-semibold">Sign In / Sign Up</span>
+                  <span className="text-sm font-semibold">My Account</span>
                 </Link>
               </div>
             </div>

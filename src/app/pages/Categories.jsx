@@ -165,7 +165,7 @@ export function Categories() {
       >
         <div
           onClick={() => navigate(targetUrl)}
-          className="group flex flex-col h-full bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all cursor-pointer"
+          className="group flex flex-col h-full bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl hover:border-[#1CA7A6] transition-all cursor-pointer"
         >
           <div className="relative h-48 overflow-hidden bg-muted">
             <img
@@ -208,7 +208,7 @@ export function Categories() {
                     </span>
                     <button
                       onClick={() => updateQuantity(cartItem.cartId, 1)}
-                      className="w-7 h-7 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all flex-shrink-0"
+                      className="w-7 h-7 flex items-center justify-center border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-full transition-colors flex-shrink-0"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
@@ -240,7 +240,7 @@ export function Categories() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </motion.div >
     );
   };
 
@@ -266,7 +266,7 @@ export function Categories() {
       >
         <div
           onClick={() => navigate(targetUrl)}
-          className="group flex flex-col h-full p-5 bg-card border border-border rounded-xl hover:border-primary/50 hover:shadow-xl transition-all cursor-pointer"
+          className="group flex flex-col h-full p-5 bg-card border border-border rounded-xl hover:border-[#1CA7A6] hover:shadow-xl transition-all cursor-pointer"
         >
           <div className="flex-1 text-left mb-4">
             <div className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-2">
@@ -305,7 +305,7 @@ export function Categories() {
                 </span>
                 <button
                   onClick={() => updateQuantity(cartItem.cartId, 1)}
-                  className="w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 rounded-full transition-all shadow-sm flex-shrink-0"
+                  className="w-8 h-8 flex items-center justify-center border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-full transition-colors shadow-sm flex-shrink-0"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -334,7 +334,7 @@ export function Categories() {
             )}
           </div>
         </div>
-      </motion.div>
+      </motion.div >
     );
   };
 
@@ -444,7 +444,7 @@ export function Categories() {
                   placeholder="Search by name, code, or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-foreground"
+                  className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1CA7A6]/50 focus:border-[#1CA7A6] hover:border-[#1CA7A6] transition-all text-foreground"
                 />
               </div>
             </div>
@@ -458,7 +458,7 @@ export function Categories() {
                   <Link
                     to={customConfigUrl}
                     className={`px-6 py-2.5 font-semibold rounded-lg transition-opacity flex items-center gap-2 shadow-sm ${firstModel
-                      ? "bg-primary text-primary-foreground hover:opacity-90"
+                      ? "border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6]"
                       : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
                       }`}
                     onClick={(e) => {

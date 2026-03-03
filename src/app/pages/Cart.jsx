@@ -32,10 +32,10 @@ export function Cart() {
                 </p>
                 <Link
                     to="/categories"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg transition-colors"
                 >
-                    Start Exploring
-                    <ArrowRight className="w-5 h-5" />
+                    <span>Start Exploring</span>
+                    <ArrowRight className="w-4 h-4" />
                 </Link>
             </div>
         );

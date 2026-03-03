@@ -33,12 +33,12 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pointer-events-auto">
               <Link
                 to="/categories"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg transition-colors"
               >
                 <span>Explore Products</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <button className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-border rounded-lg hover:bg-secondary transition-colors">
+              <button className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-foreground bg-transparent text-foreground hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg transition-colors">
                 <span>Request Quote</span>
               </button>
             </div>
@@ -156,7 +156,7 @@ export function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="p-6 border border-border rounded-lg hover:shadow-lg transition-shadow bg-card"
+                className="p-6 border border-border rounded-lg hover:shadow-lg hover:border-[#1CA7A6] transition-all bg-card"
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-primary" />
@@ -229,12 +229,12 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/categories"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-foreground text-primary rounded-lg hover:opacity-90 transition-opacity"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-foreground bg-transparent hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg transition-colors"
               >
                 <span>Browse Products</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <button className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-primary-foreground/30 rounded-lg hover:bg-primary-foreground/10 transition-colors">
+              <button className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-foreground bg-transparent hover:bg-[#1CA7A6] hover:text-white hover:border-[#1CA7A6] rounded-lg transition-colors">
                 <span>Contact Sales</span>
               </button>
             </div>

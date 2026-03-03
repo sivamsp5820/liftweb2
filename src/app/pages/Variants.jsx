@@ -61,7 +61,7 @@ export function Variants() {
                         </Link>
                         <ChevronRight className="w-4 h-4" />
                         <Link
-                            to={`/category/${category.id}`}
+                            to={category.id === 'doors' ? `/categories?category=${category.id}` : `/category/${category.id}`}
                             className="hover:text-foreground"
                         >
                             {category.name}
