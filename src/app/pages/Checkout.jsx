@@ -590,7 +590,7 @@ export function Checkout() {
                     />
                   </div>
 
-                  <div className="">
+                  <div className="pt-1">
                     <button
                       type="submit"
                       form="checkout-form"
