@@ -10,7 +10,8 @@ import {
     Bell,
     Search,
     ChevronRight,
-    LogOut
+    LogOut,
+    Command
 } from 'lucide-react';
 
 export function DashboardLayout({ children, type = 'admin' }) {
@@ -49,6 +50,13 @@ export function DashboardLayout({ children, type = 'admin' }) {
     ];
 
     React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('openPalette') === 'true') {
+            setShowPalette(true);
+            // Clean up the URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         const handleKeyDown = (e) => {
             // Helper to check if user is in an input
             const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
@@ -61,7 +69,6 @@ export function DashboardLayout({ children, type = 'admin' }) {
             if (isAltP || isShiftCtrlP || isSlash) {
                 e.preventDefault();
                 setShowPalette(prev => !prev);
-                console.log('Command Palette triggered');
             }
 
             if (e.key === 'Escape') {
@@ -225,6 +232,13 @@ export function DashboardLayout({ children, type = 'admin' }) {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setShowPalette(true)}
+                            className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-lg hover:bg-primary/20 transition-all text-xs font-bold"
+                        >
+                            <Command className="w-4 h-4" />
+                            Commands
+                        </button>
                         <button className="relative p-2 hover:bg-secondary rounded-lg transition-colors">
                             <Bell className="w-5 h-5 text-muted-foreground" />
                             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-card" />
