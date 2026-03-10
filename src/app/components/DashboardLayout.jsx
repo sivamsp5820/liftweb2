@@ -50,17 +50,27 @@ export function DashboardLayout({ children, type = 'admin' }) {
 
     React.useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+            // Helper to check if user is in an input
+            const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+
+            // Trigger on Alt + P OR Shift + Ctrl + P OR Slash (if not in input)
+            const isAltP = e.altKey && e.code === 'KeyP';
+            const isShiftCtrlP = e.shiftKey && (e.metaKey || e.ctrlKey) && e.code === 'KeyP';
+            const isSlash = e.key === '/' && !isInput;
+
+            if (isAltP || isShiftCtrlP || isSlash) {
                 e.preventDefault();
                 setShowPalette(prev => !prev);
+                console.log('Command Palette triggered');
             }
+
             if (e.key === 'Escape') {
                 setShowPalette(false);
                 setShowSearchResults(false);
             }
         };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        window.addEventListener('keydown', handleKeyDown, true);
+        return () => window.removeEventListener('keydown', handleKeyDown, true);
     }, []);
 
     return (
@@ -180,8 +190,9 @@ export function DashboardLayout({ children, type = 'admin' }) {
                             className="w-full pl-10 pr-12 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1">
-                            <kbd className="px-1.5 py-0.5 bg-card border border-border rounded text-[10px] font-bold text-muted-foreground">⌘</kbd>
-                            <kbd className="px-1.5 py-0.5 bg-card border border-border rounded text-[10px] font-bold text-muted-foreground">K</kbd>
+                            <kbd className="px-1.5 py-0.5 bg-card border border-border rounded text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alt P</kbd>
+                            <span className="text-[10px] text-muted-foreground">or</span>
+                            <kbd className="px-1.5 py-0.5 bg-card border border-border rounded text-[10px] font-bold text-muted-foreground uppercase tracking-widest">/</kbd>
                         </div>
 
                         {/* Search Overlay */}
