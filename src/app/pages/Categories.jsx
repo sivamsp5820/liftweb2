@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router";
 import { ArrowRight, LayoutGrid, List, Plus, Settings, Minus, Search } from "lucide-react";
 import { liftCategories, liftSubcategories, liftModels } from "../data/lifts";
 import { CategorySidebar } from "../components/CategorySidebar";
+import { BatchUpload } from "../components/BatchUpload";
 import { motion, AnimatePresence } from "motion/react";
 import { useViewMode } from "../context/ViewModeContext";
 import { useCart } from "../context/CartContext";
@@ -408,6 +409,9 @@ export function Categories() {
               })()}
             </div>
           </div>
+
+          {/* Batch Upload Section */}
+          <BatchUpload />
 
           {/* Product Grid */}
           <AnimatePresence mode="wait">

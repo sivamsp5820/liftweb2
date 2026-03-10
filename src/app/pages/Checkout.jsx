@@ -38,11 +38,14 @@ export function Checkout() {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
       paymentMethod: "quote",
       country: "United States",
+      billingCountry: "United States",
+      sameAsBilling: false,
     },
   });
 
@@ -75,6 +78,31 @@ export function Checkout() {
     }
     return false;
   };
+
+  const sameAsBilling = watch("sameAsBilling");
+  const billingStreet = watch("billingStreet");
+  const billingCity = watch("billingCity");
+  const billingState = watch("billingState");
+  const billingZipCode = watch("billingZipCode");
+  const billingCountry = watch("billingCountry");
+
+  useEffect(() => {
+    if (sameAsBilling) {
+      setValue("street", billingStreet, { shouldValidate: true });
+      setValue("city", billingCity, { shouldValidate: true });
+      setValue("state", billingState, { shouldValidate: true });
+      setValue("zipCode", billingZipCode, { shouldValidate: true });
+      setValue("country", billingCountry, { shouldValidate: true });
+    }
+  }, [
+    sameAsBilling,
+    billingStreet,
+    billingCity,
+    billingState,
+    billingZipCode,
+    billingCountry,
+    setValue
+  ]);
 
   useEffect(() => {
     if (cart.length === 0) {
@@ -415,6 +443,51 @@ export function Checkout() {
                       />
                     </div>
                   </div>
+
+                  <div className="md:col-span-2 mt-4">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">Billing Address</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm mb-2">Street Address <span className="text-destructive">*</span></label>
+                        <input
+                          {...register("billingStreet", { required: "Billing street is required" })}
+                          className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm mb-2">City <span className="text-destructive">*</span></label>
+                          <input
+                            {...register("billingCity", { required: "Billing city is required" })}
+                            className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm mb-2">State <span className="text-destructive">*</span></label>
+                          <input
+                            {...register("billingState", { required: "Billing state is required" })}
+                            className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm mb-2">ZIP Code <span className="text-destructive">*</span></label>
+                          <input
+                            {...register("billingZipCode", { required: "Billing ZIP code is required" })}
+                            className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm mb-2">Country <span className="text-destructive">*</span></label>
+                          <input
+                            {...register("billingCountry", { required: "Billing country is required" })}
+                            className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -426,13 +499,28 @@ export function Checkout() {
                 </h2>
 
                 <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4 p-3 bg-primary/5 rounded-lg border border-primary/10">
+                    <input
+                      type="checkbox"
+                      id="same-as-billing"
+                      {...register("sameAsBilling")}
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                    />
+                    <label htmlFor="same-as-billing" className="text-sm font-medium cursor-pointer">
+                      Installation address same as billing address
+                    </label>
+                  </div>
+
                   <div>
                     <label className="block text-sm mb-2">
                       Street Address <span className="text-destructive">*</span>
                     </label>
                     <input
-                      {...register("street", { required: "Street address is required" })}
-                      className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                      {...register("street", {
+                        required: !sameAsBilling && "Street address is required",
+                        disabled: sameAsBilling
+                      })}
+                      className={`w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary ${sameAsBilling ? "opacity-50 cursor-not-allowed" : ""}`}
                     />
                     {errors.street && (
                       <p className="text-destructive text-sm mt-1">
@@ -447,8 +535,11 @@ export function Checkout() {
                         City <span className="text-destructive">*</span>
                       </label>
                       <input
-                        {...register("city", { required: "City is required" })}
-                        className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        {...register("city", {
+                          required: !sameAsBilling && "City is required",
+                          disabled: sameAsBilling
+                        })}
+                        className={`w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary ${sameAsBilling ? "opacity-50 cursor-not-allowed" : ""}`}
                       />
                       {errors.city && (
                         <p className="text-destructive text-sm mt-1">
@@ -462,8 +553,11 @@ export function Checkout() {
                         State/Province <span className="text-destructive">*</span>
                       </label>
                       <input
-                        {...register("state", { required: "State is required" })}
-                        className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        {...register("state", {
+                          required: !sameAsBilling && "State is required",
+                          disabled: sameAsBilling
+                        })}
+                        className={`w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary ${sameAsBilling ? "opacity-50 cursor-not-allowed" : ""}`}
                       />
                       {errors.state && (
                         <p className="text-destructive text-sm mt-1">
@@ -478,13 +572,14 @@ export function Checkout() {
                       </label>
                       <input
                         {...register("zipCode", {
-                          required: "ZIP code is required",
-                          pattern: {
+                          required: !sameAsBilling && "ZIP code is required",
+                          pattern: !sameAsBilling ? {
                             value: /^[0-9A-Za-z\s-]+$/i,
                             message: "Invalid ZIP code"
-                          }
+                          } : undefined,
+                          disabled: sameAsBilling
                         })}
-                        className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        className={`w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary ${sameAsBilling ? "opacity-50 cursor-not-allowed" : ""}`}
                       />
                       {errors.zipCode && (
                         <p className="text-destructive text-sm mt-1">
@@ -498,8 +593,11 @@ export function Checkout() {
                         Country <span className="text-destructive">*</span>
                       </label>
                       <input
-                        {...register("country", { required: "Country is required" })}
-                        className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        {...register("country", {
+                          required: !sameAsBilling && "Country is required",
+                          disabled: sameAsBilling
+                        })}
+                        className={`w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary ${sameAsBilling ? "opacity-50 cursor-not-allowed" : ""}`}
                       />
                       {errors.country && (
                         <p className="text-destructive text-sm mt-1">

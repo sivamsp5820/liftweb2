@@ -63,7 +63,7 @@ export function MyAccount() {
             id: "ORD-2026-8921",
             date: "Mar 01, 2026",
             total: 28450,
-            status: "processing", // pending, processing, shipped, delivered
+            status: "so_created", // order_placed, so_created, mo_created, dispatch_planned, invoice, out_for_delivery
             items: [
                 { name: "CORE MD Landing Door", qty: 2, code: "CMD-LD-800" },
                 { name: "STELLAR Car Door", qty: 1, code: "STL-CD-900" }
@@ -74,7 +74,7 @@ export function MyAccount() {
             id: "ORD-2026-6543",
             date: "Feb 15, 2026",
             total: 15200,
-            status: "shipped",
+            status: "dispatch_planned",
             items: [
                 { name: "CORE Landing Door", qty: 4, code: "COR-LD-700" }
             ],
@@ -84,7 +84,7 @@ export function MyAccount() {
             id: "ORD-2025-1102",
             date: "Nov 28, 2025",
             total: 42100,
-            status: "delivered",
+            status: "out_for_delivery",
             items: [
                 { name: "STELLAR Landing Door", qty: 5, code: "STL-LD-1000" },
                 { name: "CORE MD Car Door", qty: 3, code: "CMD-CD-800" }
@@ -95,30 +95,36 @@ export function MyAccount() {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'pending': return 'text-yellow-600 bg-yellow-600/10 border-yellow-600/20';
-            case 'processing': return 'text-blue-600 bg-blue-600/10 border-blue-600/20';
-            case 'shipped': return 'text-indigo-600 bg-indigo-600/10 border-indigo-600/20';
-            case 'delivered': return 'text-green-600 bg-green-600/10 border-green-600/20';
+            case 'order_placed': return 'text-yellow-600 bg-yellow-600/10 border-yellow-600/20';
+            case 'so_created': return 'text-blue-600 bg-blue-600/10 border-blue-600/20';
+            case 'mo_created': return 'text-purple-600 bg-purple-600/10 border-purple-600/20';
+            case 'dispatch_planned': return 'text-orange-600 bg-orange-600/10 border-orange-600/20';
+            case 'invoice': return 'text-indigo-600 bg-indigo-600/10 border-indigo-600/20';
+            case 'out_for_delivery': return 'text-green-600 bg-green-600/10 border-green-600/20';
             default: return 'text-muted-foreground bg-secondary/50 border-border';
         }
     };
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'pending': return <Clock className="w-4 h-4" />;
-            case 'processing': return <Settings className="w-4 h-4 animate-spin-slow" />;
-            case 'shipped': return <Truck className="w-4 h-4" />;
-            case 'delivered': return <CheckCircle2 className="w-4 h-4" />;
+            case 'order_placed': return <Clock className="w-4 h-4" />;
+            case 'so_created': return <Settings className="w-4 h-4 animate-spin-slow" />;
+            case 'mo_created': return <Settings className="w-4 h-4 animate-spin-slow" />;
+            case 'dispatch_planned': return <Package className="w-4 h-4" />;
+            case 'invoice': return <Mail className="w-4 h-4" />;
+            case 'out_for_delivery': return <Truck className="w-4 h-4" />;
             default: return <Package className="w-4 h-4" />;
         }
     };
 
     const renderProgressBar = (progress, status) => {
         const steps = [
-            { label: "Order Placed", threshold: 10 },
-            { label: "Processing", threshold: 40 },
-            { label: "Shipped", threshold: 80 },
-            { label: "Delivered", threshold: 100 }
+            { label: "Order Placed", threshold: 16 },
+            { label: "SO created", threshold: 33 },
+            { label: "MO created", threshold: 50 },
+            { label: "Dispatch planned", threshold: 66 },
+            { label: "Invoice", threshold: 83 },
+            { label: "Out for delivery", threshold: 100 }
         ];
 
         return (
@@ -134,7 +140,7 @@ export function MyAccount() {
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ duration: 1, delay: 0.2 }}
-                        className={`absolute top-0 left-0 h-full rounded-full ${status === 'delivered' ? 'bg-green-500' : 'bg-primary'}`}
+                        className={`absolute top-0 left-0 h-full rounded-full ${status === 'out_for_delivery' ? 'bg-green-500' : 'bg-primary'}`}
                     />
                 </div>
 
@@ -145,7 +151,7 @@ export function MyAccount() {
                         const isCurrent = progress < step.threshold && (idx === 0 || progress >= steps[idx - 1].threshold);
 
                         return (
-                            <div key={step.label} className="flex flex-col items-center w-1/4 relative z-10">
+                            <div key={step.label} className="flex flex-col items-center flex-1 relative z-10">
                                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-2 transition-colors ${isCompleted ? 'bg-primary text-primary-foreground' :
                                     isCurrent ? 'bg-background border-2 border-primary text-primary' :
                                         'bg-secondary text-muted-foreground'
@@ -253,7 +259,7 @@ export function MyAccount() {
                                                         <h3 className="text-lg font-mono font-bold tracking-tight">{order.id}</h3>
                                                         <div className={`px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold rounded-full border flex items-center gap-1.5 ${getStatusColor(order.status)}`}>
                                                             {getStatusIcon(order.status)}
-                                                            {order.status}
+                                                            {order.status.replace(/_/g, ' ')}
                                                         </div>
                                                     </div>
                                                     <p className="text-sm text-muted-foreground">Placed on {order.date}</p>
@@ -283,7 +289,7 @@ export function MyAccount() {
                                             </div>
 
                                             {/* Progress Tracking */}
-                                            {status !== 'delivered' && renderProgressBar(order.progress, order.status)}
+                                            {order.status !== 'out_for_delivery' && renderProgressBar(order.progress, order.status)}
 
                                             {/* Actions */}
                                             <div className="mt-6 pt-4 border-t border-border flex justify-end gap-3">

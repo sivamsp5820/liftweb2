@@ -145,12 +145,14 @@ export function Layout() {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm uppercase tracking-wide mb-4">Support</h3>
+              <h3 className="text-sm uppercase tracking-wide mb-4">Internal</h3>
               <ul className="space-y-2 text-sm text-primary-foreground/80">
-                <li>Documentation</li>
-                <li>Maintenance</li>
-                <li>Warranty</li>
-                <li>Contact Us</li>
+                <li>
+                  <Link to="/admin" className="hover:text-white transition-colors">Admin Portal</Link>
+                </li>
+                <li>
+                  <Link to="/management" className="hover:text-white transition-colors">Management Portal</Link>
+                </li>
               </ul>
             </div>
             <div>

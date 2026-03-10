@@ -9,6 +9,11 @@ import { Variants } from "./pages/Variants";
 import { Cart } from "./pages/Cart";
 import { Auth } from "./pages/Auth";
 import { MyAccount } from "./pages/MyAccount";
+import { AdminDashboard } from "./pages/admin/AdminDashboard";
+import { AgentManagement } from "./pages/admin/AgentManagement";
+import { SystemConfig } from "./pages/admin/SystemConfig";
+import { OrderManagement } from "./pages/management/OrderManagement";
+import { CustomerCRM } from "./pages/management/CustomerCRM";
 import { Layout } from "./components/Layout";
 
 export const router = createBrowserRouter([
@@ -28,4 +33,11 @@ export const router = createBrowserRouter([
       { path: "account", Component: MyAccount },
     ],
   },
+  // Admin Portal - Separate from main layout
+  { path: "admin", Component: AdminDashboard },
+  { path: "admin/agents", Component: AgentManagement },
+  { path: "admin/config", Component: SystemConfig },
+  // Management Portal - Separate from main layout
+  { path: "management", Component: OrderManagement },
+  { path: "management/crm", Component: CustomerCRM },
 ]);
